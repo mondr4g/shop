@@ -2,8 +2,6 @@
     session_start();
     include 'DB_FUNCTIONS/DB_Functions.php';
     //validar si aun no se ha realizado el login
-    if ($_POST) {
-   
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,6 +13,9 @@
     <link rel="stylesheet" type="text/css" href="resp.css?v=<?php echo time(); ?>">
 </head>
 <body>
+    <?php
+        if (!$_POST) {
+    ?>
 	<main>
 		<div class="home-grid">
 			<div class="main-img">
@@ -22,15 +23,15 @@
             <div class="login">
                 <h3>LIVERPURI.</h3>
                 <div class="form-login">
-                    <form method="POST" action="">
+                    <form method="POST" action="login.php">
                         <h1> Iniciar Sesión </h1>
                         <div class="input-group">
                             <label> Usuario </label>
-                            <input type="text"id="user" name="txtusr" autocomplete="off">
+                            <input type="text"id="user" name="user" autocomplete="off">
                         </div>
                         <div class="input-group">
                             <label> Contraseña </label>
-                            <input type="password" name="txtpasswd" autocomplete="off">
+                            <input type="password" id="passw" name="passw" autocomplete="off">
                         </div>  
                         <button type="submit" name="iniciar" class="sign-in"> Login </button>
                         <a href="regist.html">Registrarse</a>
@@ -42,25 +43,28 @@
             </div>
 		</div>	
 	</main>
+    <?php
+        }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on']) )){
+            echo $_POST['txtusr'],$_POST['txtpasswd'];
+            $usuario=obtener_user($_POST['user'],$_POST['passw']);
+            if($usuario){
+                //aqui se decide que tipo de usuario es 
+                if(select_admin($usuario['Id_usuario'])){
+                    $_SESSION['admin_on']=$usuario['Id_usuario'];
+                    header("location:Adminis.php");
+                }else{
+                    $_SESSION['client_on']=$usuario['Id_usuario'];
+                    header("location:Index.php");
+                }
+                //puta madreeee
+            }else{
+                $_SESSION['admin_on']=null;
+                $_SESSION['client_on']=null;
+                header('location:regist.php');
+            }
+
+
+        }
+?>
 </body>
 </html>
-<?php
-     }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])  )){
-        $usuario=validate_user($_POST['user'],$_POST['pass']);
-
-        if($usuario){
-            //aqui se decide que tipo de usuario es 
-            if($usuario['usr_type']==1){
-                $_SESSION['admin_on']=$usuario['id_usuario'];
-            
-            }
-            //puta madreeee
-        }else{
-            $_SESSION['admin_on']=null;
-            $_SESSION['client_on']=null;
-            header('location:login.php');
-        }
-
-
-    }
-?>

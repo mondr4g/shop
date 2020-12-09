@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+<?php
+    session_start();
+?>
+<!DOCTYPE html> 
 <html lang="en-us">
 <head>
 	<meta charset="utf-8">
@@ -21,6 +24,20 @@
                 <li><a href="#shop">Mujer</a></li>
                 <li><a href="#contact">Niño/a</a></li>
                 <li><a href="#contact">Rebajas</a></li>
+                <?php
+                    if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
+                ?>
+                <li><a href="login.php">Sign in</a></li>
+                <?php
+                    }
+                ?>
+                <?php
+                    if (isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])) {      
+                ?>
+                <li><a href="logout.php">Sing out</a></li>
+                <?php
+                    }
+                ?>
             </ul>
             <a href="#contact"><img id="shop-car" src="img/shopping_car.png" alt="shop-car"></a>
         </nav>
