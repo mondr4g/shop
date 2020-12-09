@@ -1,3 +1,10 @@
+<?php
+    session_start();
+    include 'DB_FUNCTIONS/DB_Functions.php';
+    //validar si aun no se ha realizado el login
+    if ($_POST) {
+   
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,3 +44,23 @@
 	</main>
 </body>
 </html>
+<?php
+     }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])  )){
+        $usuario=validate_user($_POST['user'],$_POST['pass']);
+
+        if($usuario){
+            //aqui se decide que tipo de usuario es 
+            if($usuario['usr_type']==1){
+                $_SESSION['admin_on']=$usuario['id_usuario'];
+            
+            }
+            //puta madreeee
+        }else{
+            $_SESSION['admin_on']=null;
+            $_SESSION['client_on']=null;
+            header('location:login.php');
+        }
+
+
+    }
+?>
