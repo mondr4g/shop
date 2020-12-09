@@ -1,3 +1,10 @@
+<?php
+    session_start();
+    include 'BD_FUNCTIONS/BD_Functions.php';
+    //validar si aun no se ha realizado el login
+    if ($_POST) {
+   
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,11 +26,11 @@
                         <h1> Iniciar Sesión </h1>
                         <div class="input-group">
                             <label> Usuario </label>
-                            <input type="text"id="user" name="txtusr" autocomplete="off">
+                            <input type="text" id="user" name="txtusr" autocomplete="off">
                         </div>
                         <div class="input-group">
                             <label> Contraseña </label>
-                            <input type="password" name="txtpasswd" autocomplete="off">
+                            <input type="password" id="pass" name="txtpasswd" autocomplete="off">
                         </div>  
                         <button type="submit" name="iniciar" class="sign-in"> Login </button>
                         <a href="regist.html">Registrarse</a>
@@ -37,3 +44,23 @@
 	</main>
 </body>
 </html>
+<?php
+     }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])  )){
+        $usuario=validate_user($_POST['user'],$_POST['pass']);
+
+        if($usuario){
+            //aqui se decide que tipo de usuario es 
+            if($usuario['usr_type']==1){
+                $_SESSION['admin_on']=$usuario['id_usuario'];
+            
+            }
+            //puta madreeee
+        }else{
+            $_SESSION['admin_on']=null;
+            $_SESSION['client_on']=null;
+            header('location:login.php');
+        }
+
+
+    }
+?>
