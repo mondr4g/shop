@@ -29,7 +29,7 @@
                         <h1> Registro </h1>
                         <div class="input-group">
                             <label> Usuario </label>
-                            <input type="text"id="user" name="txtusr" autocomplete="off" required >
+                            <input type="text" name="txtusr" autocomplete="off" required >
                         </div>
                         <div class="input2">
                             <div class="input-group">
@@ -161,7 +161,7 @@
                                 <div class="input2">
                                     <div class="input-group">
                                         <label>Tipo</label>
-                                        <select name="tipo" id="tipo">
+                                        <select name="tipo">
                                             <option value="no" >Seleccionar tipo</option>
                                             <option value="1" >Cliente</option>
                                             <option value="2" >Administrador</option>
@@ -199,7 +199,7 @@
             //abierto a modificacion si solo queremos que el admin registre usuarios
         }elseif ($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on']) )) {
             $new_user_data = array(
-                "username" => $_POST['txtuser'],
+                "username" => $_POST['txtusr'],
                 "password" => $_POST['txtpasswd'],
                 "nom_1" => $_POST['nom1'],
                 "nom_2" => $_POST['nom2'],
@@ -221,7 +221,7 @@
             if(insert_user($new_user_data)){
                 //aqui para meter scripts de JS o mensajes
                 //abierto a sugerencias
-                $id=select_user_id($_POST["username"]);
+                $id=select_user_id($new_user_data['username']);
                 if($_POST['tipo']=="1"){
                     insert_client($id,$_POST['genero'],$_POST['gustos']);
                 }elseif($_POST['tipo']=="2"){
