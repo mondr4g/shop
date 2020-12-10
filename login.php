@@ -27,14 +27,14 @@
                         <h1> Iniciar Sesión </h1>
                         <div class="input-group">
                             <label> Usuario </label>
-                            <input type="text"id="user" name="user" autocomplete="off">
+                            <input type="text" id="user" name="user" autocomplete="off">
                         </div>
                         <div class="input-group">
                             <label> Contraseña </label>
                             <input type="password" id="passw" name="passw" autocomplete="off">
                         </div>  
                         <button type="submit" name="iniciar" class="sign-in"> Login </button>
-                        <a href="regist.html">Registrarse</a>
+                        <a href="regist.php">Registrarse</a>
                     </form>
                 </div>
                 <div class="copy">
@@ -46,7 +46,7 @@
     <?php
         }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on']) )){
             echo $_POST['txtusr'],$_POST['txtpasswd'];
-            $usuario=obtener_user($_POST['user'],$_POST['passw']);
+            $usuario=validate_user($_POST['user'],$_POST['passw']);
             if($usuario){
                 //aqui se decide que tipo de usuario es 
                 if(select_admin($usuario['Id_usuario'])){
