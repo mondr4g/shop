@@ -55,7 +55,7 @@
     }
 
     //insertar usuarios en general
-    function insert_user($user_data, $type){
+    function insert_user($user_data){
         $sql_insert="INSERT INTO `usuario`(`Id_usuario`, `username`, `passw`, `email`, `p_nombre`, `s_nombre`, `ape_pat`, `ape_mat`, ".
         "`fec_nac`, `telefono`, `ciudad`, `colonia`, `estado`, `calle`, `numero`, `num_interior`, `cod_postal`) VALUES ".
         "( ,'".$user_data['username']."','".sha1($user_data['password'])."','".$user_data['email']."',".
@@ -72,13 +72,13 @@
     //inertar administrador
     function insert_admin($id_user){
         $sql_insert="INSERT INTO `administrador`(`Id_cliente`) VALUES ".
-        "('".intval($id_user)."');";
+        "(".intval($id_user).");";
         $GLOBALS['conne']->query($sql_insert);
     }
     //insertar clientes
     function insert_client($id_user,$genero,$gustos){
         $sql_insert="INSERT INTO `cliente`(`Id_cliente`, `gustos`,`genero`) VALUES ".
-        "('".intval($id_user)."','".$gustos."','".$genero."');";
+        "(".intval($id_user).",'".$gustos."','".$genero."');";
         $GLOBALS['conne']->query($sql_insert);
     }
 

@@ -38,7 +38,7 @@
                             </div>
                             <div class="input-group">
                                 <label> Confirmar Contraseña </label>
-                                <input type="password" name="txtpasswd1" autocomplete="off" required>
+                                <input type="password" name="txtpasswd1" autocomplete="off">
                             </div>    
                         </div>
                         <div class="input2">
@@ -78,11 +78,11 @@
                         <div class="input2">
                             <div class="input-group">
                                 <label> Email </label>
-                                <input type="email" name="email2" autocomplete="off" required>
+                                <input type="email" name="email2" autocomplete="off" >
                             </div>
                             <div class="input-group">
                                 <label> Telefono </label>
-                                <input type="tel" name="tel2" autocomplete="off" required>
+                                <input type="tel" name="tel2" autocomplete="off" >
                             </div>    
                         </div>
                         <div class="input2">
