@@ -94,6 +94,50 @@
         $GLOBALS['conne']->query($sql_insert);
     }
 
+
+    //RECUPERAR TODOS LOS CLIENTES
+    function select_all_clients(){
+        $sql_select_client="SELECT * FROM usuario NATURAL JOIN cliente;";
+        $result=$GLOBALS['conne']->query($sql_select_client);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    //busqueda de cliente por username
+    function search_client_by_name($username){
+        $sql_bus="SELECT * FROM usuario NATURAL JOIN cliente WHERE usuario.username LIKE '%$username%';";
+        $result=$GLOBALS['conne']->query($sql_bus);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    //busqueda de admin por username
+    function search_admin_by_name($username){
+        $sql_bus="SELECT * FROM usuario NATURAL JOIN administrador WHERE usuario.username LIKE '%$username%';";
+        $result=$GLOBALS['conne']->query($sql_bus);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    //recuperar todos los administradores
+    function select_all_admins(){
+        $sql_select_client="SELECT * FROM usuario NATURAL JOIN administrador;";
+        $result=$GLOBALS['conne']->query($sql_select_client);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
     
     //***********************
     //Funciones para los productos
@@ -110,12 +154,32 @@
             return $catalago;
         }
     }
+    //Retorna un producto de acuerdo al ID que se recibe como parametro.
+    function especific_product($id_product){
+        $producto=null;
+        $sql_select="SELECT * FROM producto WHERE Id_producto = ".intval($id_product)." ;";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows>0){
+            $producto=$result->fetch_assoc();
+            return $producto;
+        }else{
+            return $producto;
+        }
+    }
     //insertar producto
     function insert_product($p_data){
+        //Asumimos que los datos del nuevo producto vienen definidos en un vector.
         //se supone que la estructura de las imagenes ya viene definida como JSON.
-       /* $sql_insert="INSERT INTO `producto`(`nombre`, `descripcion`, `precio`, `stock`, `marca`, `talla`, `tipo`, ".
+        $sql_insert="INSERT INTO `producto`(`nombre`, `descripcion`, `precio`, `stock`, `marca`, `talla`, `tipo`, ".
         "`Fecha_lanzamiento`, `categoria`, `imgs`, `status`) VALUES ".
-        "('".."','".."',"..","..",'".."','".."','".."','".."','".."','".."',"..");";*/
+        "('".$p_data['nombre']."','".$p_data['desc']."',".doubleval($p_data['precio']).",".intval($p_data['stock']).",'".$p_data['marca']."',".
+        "'".$p_data['talla']."','".$p_data['tipo']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
+
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     //funcion para seleccionar productos de acuerdo a los filtros
@@ -124,12 +188,57 @@
     //***********************
     //Funciones para las ventas
     //***********************
-
+    function insert_compra($data_compra){
+        $sql_insert="INSERT INTO `compra`(`Id_cliente`, `total`) VALUES (".intval($data_compra['cliente']).",".doubleval($data_compra['total']).");";
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
+    }
     //***********************
     //Funciones para los comentarios
     //***********************
+    //insertar nuevo comentario
+    function new_coment($coment_data){
+        /*
+            Estructura del array $coment_data:
+                cliente: Id_cliente
+                producto: Id_prodcuto
+                comentario: comentario
+        */
+        $sql_insert="INSERT INTO `comentarios`(`Id_cliente`,`Id_producto`,`comentario`) VALUES ".
+        "(".intval($coment_data['cliente']).",".intval($coment_data['producto']).",'".$coment_data['comentario']."' ) ;";
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
 
-     //***********************
+    }
+    //seleccionar todos los comantarios, por producto
+    function select_coments_by_product($id_producto){
+        $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_producto = ".intval($id_producto)." ;";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+    //Seleccionar comentarios por cliente
+    function select_coments_by_client($id_cliente){
+        $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_cliente = ".intval($id_cliente)." ;";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+    //eliminar un comentario
+
+    //***********************
     //Funciones para los ofertas
     //***********************
 
