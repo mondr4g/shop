@@ -1,29 +1,30 @@
 <?php
+    session_start();
     //Aqui se realizara el procesamiento de las variables del carrito, aqui se podran eliminar productos y agregarlos al carrito
     //haciendo uso de variables de sesion para realizar un carrito mas limpio.
-    session_start();
-
-    
+    include 'DB_FUNCTIONS/DB_Functions.php';
     //variable opcional, la cual nos ayudara si es que queremos enviar alguna alerta al cliente, sobre el estado del producto 
     //agregado al carrito.
-    $mensaje=null;
+   
 
     //tanto los botones de agregar al carrito, como eliminar del carrito, deben de tener este nombre, solo cambiara el valor que lleven
     //Asi tendremos todo esto  ya mas comunicado 
     if(isset($_POST['btnAccion'])){
+        $mensaje=null;
         switch($_POST['btnAccion']){
             case 'Agregar':
                 if(!isset($_SESSION['CARRITO'])){
                     //SOLO MANEJARE ESTOS ATRIBUTOS DEL PRODUCTO YA QUE NO QUIERO GUARDAR TODO EL REGISTRO COMPLETO EN LA VARIABLE
                     //DE SESION, CREO QUE ES MEJOR SOLO TOMAR LOS ATRIBUTOS QUE SERVIRAN PARA LAS CUENTAS Y PARA IDENTIFICAR EL PRODUCTO
                     //CUANDO SE VEA EL DETLLE DE COMPRA, AHI SE DEBEN DE MOSTRAR TOODOS LOS DATOS
+                    $producto=especific_product($_POST['ID']);
                     $prod=array(
                         'ID'=>$_POST['ID'],
-                        'NOMBRE'=>$_POST['NOMBRE'],
-                        'DESC'=>$_POST['DESC'],
-                        'PRECIO'=>$_POST['PRECIO'],
+                        'NOMBRE'=>$producto['nombre'],
+                        'DESC'=>$producto['descripcion'],
+                        'PRECIO'=>$producto['precio'],
                         'CANT'=>$_POST['CANT'],
-                        'STOCK'=>$_POST['STOCK']
+                        'STOCK'=>$producto['stock']
                     );
                     $_SESSION['CARRITO'][0]=$prod;
                     $mensaje="Producto agregado";
@@ -42,13 +43,14 @@
                     }else{
                         //Aqui se agrega un producto nuevo.
                         $num_prods=count($_SESSION['CARRITO']);
+                        $producto=especific_product($_POST['ID']);
                         $prod=array(
                             'ID'=>$_POST['ID'],
-                            'NOMBRE'=>$_POST['NOMBRE'],
-                            'DESC'=>$_POST['DESC'],
-                            'PRECIO'=>$_POST['PRECIO'],
+                            'NOMBRE'=>$producto['nombre'],
+                            'DESC'=>$producto['descripcion'],
+                            'PRECIO'=>$producto['precio'],
                             'CANT'=>$_POST['CANT'],
-                            'STOCK'=>$_POST['STOCK']
+                            'STOCK'=>$producto['stock']
                         );
                         $_SESSION['CARRITO'][$num_prods]=$prod;
                         $mensaje="Producto agregado";

@@ -3,7 +3,7 @@
     //asignacion de la conexion a mysql como una variable global para que sea accesible dentro de este archivo.
     $GLOBALS['conne']=$conne;
 
-    //***********************
+    //*********************** 
     //Funciones para el login
     //***********************
 
@@ -100,7 +100,7 @@
         $sql_select_client="SELECT * FROM usuario NATURAL JOIN cliente;";
         $result=$GLOBALS['conne']->query($sql_select_client);
         if($result->num_rows()>0){
-            return $result->fetch_assoc();
+            return $result;
         }else{
             return null;
         }
@@ -133,25 +133,33 @@
         $sql_select_client="SELECT * FROM usuario NATURAL JOIN administrador;";
         $result=$GLOBALS['conne']->query($sql_select_client);
         if($result->num_rows()>0){
-            return $result->fetch_assoc();
+            return $result;
         }else{
             return null;
         }
     }
-    
+
+    //funcion para eliminar cualquier usuario, se supone que la base de datos realiza una eliminacion e actualizacion en cascada
+    function delete_user($id_usuario){
+        $sql_del="DELETE FROM usuario WHERE usuario.Id_usuario=".$id_usuario.";";
+        if($GLOBALS['conne']->query($sql_del)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     //***********************
     //Funciones para los productos
     //***********************
     //retorna todos los productos de la base de datos
     function select_all_products(){
-        $catalago=null;
         $sql_select = "SELECT * FROM producto WHERE status = 1;";
         $result = $GLOBALS['conne']->query($sql_select);
         if ($result->num_rows > 0) {
-            $catalago = $result->fetch_assoc();
-            return $catalago;
+            return $result;
         }else{
-            return $catalago;
+            return null;
         }
     }
     //Retorna un producto de acuerdo al ID que se recibe como parametro.
@@ -182,8 +190,42 @@
         }
     }
 
+    //funcion para producto mas caro
+    function producto_mas(){
+        $sql_prod="SELECT * FROM producto WHERE producto.precio = MAX(producto.precio);";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows>0){
+            $producto=$result->fetch_assoc();
+            return $producto;
+        }else{
+            return $producto;
+        }
+    }
+
+    //funcion para el prodcuto mas barato
+    function producto_menos(){
+        $sql_prod="SELECT * FROM producto WHERE producto.precio = MIN(producto.precio);";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows>0){
+            $producto=$result->fetch_assoc();
+            return $producto;
+        }else{
+            return $producto;
+        }
+    }
+
     //funcion para seleccionar productos de acuerdo a los filtros
 
+    //funcion para buscar productos por precio
+    function products_by_price($min, $max){
+        $sql_prod="SELECT * FROM producto WHERE producto.precio BETWEEN $min AND $max;";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return null;
+        }
+    }
 
     //***********************
     //Funciones para las ventas
@@ -221,7 +263,7 @@
         $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_producto = ".intval($id_producto)." ;";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows()>0){
-            return $result->fetch_assoc();
+            return $result;
         }else{
             return null;
         }
@@ -231,7 +273,7 @@
         $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_cliente = ".intval($id_cliente)." ;";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows()>0){
-            return $result->fetch_assoc();
+            return $result;
         }else{
             return null;
         }

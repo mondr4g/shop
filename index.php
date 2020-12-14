@@ -19,7 +19,7 @@
                 <span class="bar"></span>
             </label>
             <ul class="nav-list">
-                <li><a href="#about-us">Nuevos Lanzamientos</a></li>
+                <li><a href="catalogo.php">Nuevos Lanzamientos</a></li>
                 <li><a href="#media">Hombre</a></li>
                 <li><a href="#shop">Mujer</a></li>
                 <li><a href="#contact">Niño/a</a></li>

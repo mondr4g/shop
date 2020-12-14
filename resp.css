@@ -81,6 +81,14 @@
         margin-left: 10%;
         text-align: left;
     }
+
+    .products {
+        display: inline;
+    }
+
+    .item-box {
+        margin-left: 40%;
+    }
 }
 
 @media (max-width:1025px) {

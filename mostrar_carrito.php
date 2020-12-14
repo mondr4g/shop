@@ -1,6 +1,4 @@
 <?php
-    session_start();
-    include 'DB_FUNCTIONS/DB_Functions.php';
     //Aqui estoy incluyendo el codigo que realiza el manejo del carrito.
     include 'carrito.php';
 ?>

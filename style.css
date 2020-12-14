@@ -95,6 +95,44 @@ nav {
     grid-template-columns: repeat(10, 1fr);
 }
 
+.filter {
+    padding: 20px;
+    grid-column: 1/4;
+    margin-bottom: 10%;
+}
+
+.products {
+    margin-top: 30px;
+}
+
+.item-box {
+    width: 200px;
+    height: 250px;
+    text-align: center;
+    padding: 20px;
+}
+
+.img-item {
+    margin-bottom: 20px;
+}
+
+.imgi {
+    max-width: 120px;
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    cursor: pointer;
+}
+
+.imgi:hover {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);    
+}
+
+.info-item {
+    display: none;
+}
+
 .slide {
     background-image: url("img/slide.jpg");
     height: 635px;
@@ -139,6 +177,12 @@ button:hover {
     color: #EC3262;
     border: solid;
     border-color: #EC3262;
+}
+
+.buy {
+    padding: .5em 2em;
+    font-size: 12px;
+    margin-top: 10px;
 }
 
 .container {
@@ -253,7 +297,7 @@ button:hover {
 
 footer {
     width: 100%;
-	height: 60px;
+	height: auto;
 	text-align: center;
 	background-color: #272727;
     color: #ffffff;
