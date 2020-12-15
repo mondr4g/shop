@@ -12,7 +12,7 @@
 
         if($filters->band==true){
             
-            $str_filtrado="SELECT * FROM producto WHERE";
+            $str_filtrado="SELECT * FROM producto NATURAL JOIN tallas WHERE";
             $b_first=true;
             $bb_first=true;
             if($filters->playera==true || $filters->pantalones==true || $filters->chamarra==true || $filters->sudadera==true || $filters->abrigo){
@@ -67,44 +67,44 @@
                         //$str_filtrado+=" JSON_CONTAINS('stock', ";
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%xs%'";
+                        $str_filtrado+=" OR talla LIKE '%xs%' AND stock > 0";
                     }
                 }
                 if($filters->s){
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%s%'";
+                        $str_filtrado+=" talla LIKE '%s%'  AND stock > 0";
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%s%'";
+                        $str_filtrado+=" OR talla LIKE '%s%'  AND stock > 0";
                     }
                 }
                 if($filters->m){
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%m%'";
+                        $str_filtrado+=" talla LIKE '%m%'  AND stock > 0";
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%m%'";
+                        $str_filtrado+=" OR talla LIKE '%m%'  AND stock > 0";
                     }
                 }
                 if($filters->l){
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%l%'";
+                        $str_filtrado+=" talla LIKE '%l%'  AND stock > 0";
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR tipo LIKE '%l%'";
+                        $str_filtrado+=" OR tipo LIKE '%l%'  AND stock > 0";
                     }
                 }
                 if($filters->xl){
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%xl%'";
+                        $str_filtrado+=" talla LIKE '%xl%'  AND stock > 0";
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR tipo LIKE '%xl%'";
+                        $str_filtrado+=" OR tipo LIKE '%xl%'  AND stock > 0";
                     }
                 }
             }
 
-            $str_filtrado+=" AND precio BETWEN ".doubleval($filters->minPrice)." AND ".doubleval($filters->maxPrice)." ;";
+            $str_filtrado+=" AND producto.precio >=".doubleval($filters->minPrice)." AND producto.precio <= ".doubleval($filters->maxPrice)." ;";
             
             
         }else{
@@ -114,7 +114,7 @@
 
         //EJECUCION DE LA CONSULTA
         $products_to_show=$GLOBALS['conne']->query($str_filtrado);
-        if ($result->num_rows > 0) {
+        if ($products_to_show_rows > 0) {
             foreach($products_to_show as $prod){
                 //$prod, en esta variable viene la info de cada producto recuperado. si se quieren visualizar todos los productos.
 ?>

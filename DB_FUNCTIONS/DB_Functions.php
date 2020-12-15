@@ -6,7 +6,7 @@
     //*********************** 
     //Funciones para el login
     //***********************
-
+    //SELECT * FROM `producto` NATURAL JOIN `descripcion_producto` WHERE descripcion_producto.talla='xs'
     //funcion para obtener el usuario
     function validate_user($username,$password){
         $usuario=null;
@@ -139,6 +139,28 @@
         }
     }
 
+    //recuperar un admin especifico
+    function get_admin($id_admin){
+        $sql_sel="SELECT * FROM usuario NATURAL JOIN administrador WHERE usuario.Id_usuario=".intval($id_admin).";";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    //recuperar un cliente especific
+    function get_client($id_client){
+        $sql_sel="SELECT * FROM usuario NATURAL JOIN cliente WHERE usuario.Id_usuario=".intval($id_client).";";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows()>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
     //funcion para eliminar cualquier usuario, se supone que la base de datos realiza una eliminacion e actualizacion en cascada
     function delete_user($id_usuario){
         $sql_del="DELETE FROM usuario WHERE usuario.Id_usuario=".$id_usuario.";";
@@ -154,7 +176,7 @@
     //***********************
     //retorna todos los productos de la base de datos
     function select_all_products(){
-        $sql_select = "SELECT * FROM producto WHERE status = 1;";
+        $sql_select = "SELECT * FROM `producto` WHERE producto.status=1;";
         $result = $GLOBALS['conne']->query($sql_select);
         if ($result->num_rows > 0) {
             return $result;
@@ -165,7 +187,7 @@
     //Retorna un producto de acuerdo al ID que se recibe como parametro.
     function especific_product($id_product){
         $producto=null;
-        $sql_select="SELECT * FROM producto WHERE Id_producto = ".intval($id_product)." ;";
+        $sql_select="SELECT * FROM producto WHERE Id_producto = ".intval($id_product).";";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows>0){
             $producto=$result->fetch_assoc();
@@ -175,13 +197,13 @@
         }
     }
     //insertar producto
-    function insert_product($p_data,$tallas){
+    function insert_product($p_data, $tallas){
         //Asumimos que los datos del nuevo producto vienen definidos en un vector.
         //se supone que la estructura de las imagenes ya viene definida como JSON.
         //,".doubleval($p_data['precio']).",".intval($p_data['stock']).",
-        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`, `marca`, `tipo`, ".
+        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`,`precio`, `marca`, `tipo`, ".
         "`Fecha_lanzamiento`, `categoria`, `imgs`, `status`) VALUES ".
-        "('".$p_data['nombre']."','".$p_data['detal']."','".$p_data['marca']."',".
+        "('".$p_data['nombre']."','".$p_data['detal']."',".doubleval($p_data['precio']).",'".$p_data['marca']."',".
         "'".$p_data['tipo']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
 
         if($GLOBALS['conne']->query($sql_insert)){
@@ -189,7 +211,7 @@
             $r=$GLOBALS['conne']->query($res);
             $id=$r->fetch_assoc();
             foreach($tallas as $talla){
-                insertar_talla( $id['id'], $talla['talla'], $talla['stock'], $talla['precio']);
+                insertar_talla( $id['id'], $talla['talla'], $talla['stock']);
             }
             return true;
         }else{
@@ -197,37 +219,48 @@
         }
     }
 
-    function insertar_talla($id_product,$talla,$stock,$precio){
-        $sql_insert="INSERT INTO `descripcion_producto` (`Id_producto`,`precio`,`stock`,`talla`) VALUES (".intval($id_product).", '$talla', ".intval($stock).",".doubleval($precio).");";
+    function insertar_talla($id_product,$talla,$stock){
+        $sql_insert="INSERT INTO `descripcion_producto` (`Id_producto`,`stock`,`talla`) VALUES (".intval($id_product).", ".intval($stock).", '$talla');";
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
-    //funcion para producto mas caro
+    //recuperar tallas
+    function rec_tallas($id_product)
+    {
+        $sql_insert="SELECT * FROM tallas WHERE producto.Id_producto=".intval($id_product).";";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if ($result->num_rows>0) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+    
+    //funcion para el prodcuto mas caro
     function producto_mas(){
         $sql_prod="SELECT * FROM producto WHERE producto.precio = MAX(producto.precio);";
         $result=$GLOBALS['conne']->query($sql_prod);
-        if($result->num_rows>0){
-            $producto=$result->fetch_assoc();
-            return $producto;
-        }else{
+        if ($result->num_rows>0) {
+            return $result->fetch_assoc();
+        } else {
             return null;
         }
     }
 
-    //funcion para el prodcuto mas barato
     function producto_menos(){
+        //funcion para el prodcuto mas barato
         $sql_prod="SELECT * FROM producto WHERE producto.precio = MIN(producto.precio);";
         $result=$GLOBALS['conne']->query($sql_prod);
-        if($result->num_rows>0){
-            $producto=$result->fetch_assoc();
-            return $producto;
-        }else{
+        if ($result->num_rows>0) {
+            return $result->fetch_assoc();
+        } else {
             return null;
         }
-    }
-
-    //funcion para seleccionar productos de acuerdo a los filtros
-
-    //funcion para buscar productos por precio
+    }    //funcion para seleccionar productos de acuerdo a los filtros
     function products_by_price($min, $max){
         $sql_prod="SELECT * FROM producto WHERE producto.precio BETWEEN $min AND $max;";
         $result=$GLOBALS['conne']->query($sql_prod);
@@ -238,17 +271,70 @@
         }
     }
 
+
+
+    //funcion para manejar el stock del producto
+    function product_stock($id_prod){
+        $sql_prod_stock="SELECT producto.ID_producto, SUM(tallas.stock) as Stock_tot FROM producto NATURAL JOIN tallas WHERE producto.ID_producto=$id_prod;";
+        $result=$GLOBALS['conne']->query($sql_prod_stock);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return null;
+        }
+    }    
     //***********************
-    //Funciones para las ventas
-    //***********************
-    function insert_compra($data_compra){
+    function new_sale($data_compra){
         $sql_insert="INSERT INTO `compra`(`Id_cliente`, `total`) VALUES (".intval($data_compra['cliente']).",".doubleval($data_compra['total']).");";
-        if($GLOBALS['conne']->query($sql_insert)){
+        if ($GLOBALS['conne']->query($sql_insert)) {
             return true;
         }else{
             return false;
         }
     }
+
+    //eliminar un producto.
+    function delete_product($id_prod){
+        $sql_del="DELETE FROM producto WHERE producto.ID_producto=".$id_prod.";";
+        if($GLOBALS['conne']->query($sql_del)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //faltan
+    function modify_cliente($a_data){
+        $sql_update="UPDATE usuario u INNER JOIN cliente c ON u.Id_usuario=c.Id_usuario SET username=".
+        "'".$a_data['username']."', email='".$a_data['email']."',".
+        "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
+        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_dataa['ciudad']."',colonia='".$a_data['colonia']."',".
+        "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
+        "gustos='".$a_data['gustos']."', genero='".$a_data['genero']."' WHERE Id_usuario=".intval($a_data['id'])." ;";
+        if($GLOBALS['conne']->query($sql_update)){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    function modify_admin($a_data){
+        $sql_update="UPDATE usuario u INNER JOIN administrador a ON u.Id_usuario=a.Id_usuario SET username=".
+        "'".$a_data['username']."', email='".$a_data['email']."',".
+        "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
+        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_dataa['ciudad']."',colonia='".$a_data['colonia']."',".
+        "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
+        " WHERE Id_usuario=".intval($a_data['id'])." ;";
+        if($GLOBALS['conne']->query($sql_update)){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+
     //***********************
     //Funciones para los comentarios
     //***********************

@@ -95,3 +95,32 @@ function getRequest(data) {
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.send("json=" + JSON.stringify(data));
 }
+
+function masCant() {
+    let value = parseInt(document.getElementById('cant').innerHTML);
+    console.log(value);
+    
+    if(value < 10){
+        value++;
+        document.getElementById('msgCant').innerHTML = ""; 
+    }
+    else
+        document.getElementById('msgCant').innerHTML = "Max 10 articulos por compra";
+
+    document.getElementById('cant').innerHTML = value;    
+}
+
+function menosCant() {
+    let value = parseInt(document.getElementById('cant').innerHTML);
+    console.log(value);
+    
+    if(value > 1){
+        value--;
+        document.getElementById('msgCant').innerHTML = ""; 
+    }
+    else
+        document.getElementById('msgCant').innerHTML = "Min 1 articulos por compra";
+
+    document.getElementById('cant').innerHTML = value;      
+}
+

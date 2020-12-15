@@ -6,6 +6,7 @@
     //variable opcional, la cual nos ayudara si es que queremos enviar alguna alerta al cliente, sobre el estado del producto 
     //agregado al carrito.
    
+    //aqui validar para que solo clientes puedan agregar al carrito.
 
     //tanto los botones de agregar al carrito, como eliminar del carrito, deben de tener este nombre, solo cambiara el valor que lleven
     //Asi tendremos todo esto  ya mas comunicado 
@@ -91,6 +92,10 @@
                 }
                 break;
         }
+    }
+
+    if(isset($_GET[''])){
+        //Aqui vamos a obtener el codigo del producto.
     }
 
 

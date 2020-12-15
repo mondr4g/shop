@@ -227,7 +227,10 @@
                 }elseif($_POST['tipo']=="2"){
                     insert_admin($id);
                 }
-                header('location:login.php');
+                if($_SESSION['admin_on'])
+                    header('location:Index_admin.php');
+                else
+                    header('location:login.php');
             }else{
                 //abierto a mejoras
                 header("location:regist.php");

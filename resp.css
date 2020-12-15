@@ -89,6 +89,24 @@
     .item-box {
         margin-left: 40%;
     }
+
+    .product-view {
+        grid-column: 1/11;
+    }
+
+    .product-info {
+        grid-column: 1/11;
+        padding: 10% 23%;
+    }
+
+
+    #title-comment {
+        grid-column: 3/9;
+    }
+
+    .comentario {
+        grid-column: 3/9;
+    }
 }
 
 @media (max-width:1025px) {
