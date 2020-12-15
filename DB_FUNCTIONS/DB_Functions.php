@@ -175,42 +175,53 @@
         }
     }
     //insertar producto
-    function insert_product($p_data){
+    function insert_product($p_data,$tallas){
         //Asumimos que los datos del nuevo producto vienen definidos en un vector.
         //se supone que la estructura de las imagenes ya viene definida como JSON.
-        $sql_insert="INSERT INTO `producto`(`nombre`, `descripcion`, `precio`, `stock`, `marca`, `talla`, `tipo`, ".
+        //,".doubleval($p_data['precio']).",".intval($p_data['stock']).",
+        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`, `marca`, `tipo`, ".
         "`Fecha_lanzamiento`, `categoria`, `imgs`, `status`) VALUES ".
-        "('".$p_data['nombre']."','".$p_data['desc']."',".doubleval($p_data['precio']).",".intval($p_data['stock']).",'".$p_data['marca']."',".
-        "'".$p_data['talla']."','".$p_data['tipo']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
+        "('".$p_data['nombre']."','".$p_data['detal']."','".$p_data['marca']."',".
+        "'".$p_data['tipo']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
 
         if($GLOBALS['conne']->query($sql_insert)){
+            $res="SELECT MAX(usuario.Id_usuario) as id FROM usuario;";
+            $r=$GLOBALS['conne']->query($res);
+            $id=$r->fetch_assoc();
+            foreach($tallas as $talla){
+                insertar_talla( $id['id'], $talla['talla'], $talla['stock'], $talla['precio']);
+            }
             return true;
         }else{
             return false;
         }
     }
 
+    function insertar_talla($id_product,$talla,$stock,$precio){
+        $sql_insert="INSERT INTO `descripcion_producto` (`Id_producto`,`precio`,`stock`,`talla`) VALUES (".intval($id_product).", '$talla', ".intval($stock).",".doubleval($precio).");";
+    }
+
     //funcion para producto mas caro
     function producto_mas(){
         $sql_prod="SELECT * FROM producto WHERE producto.precio = MAX(producto.precio);";
-        $result=$GLOBALS['conne']->query($sql_select);
+        $result=$GLOBALS['conne']->query($sql_prod);
         if($result->num_rows>0){
             $producto=$result->fetch_assoc();
             return $producto;
         }else{
-            return $producto;
+            return null;
         }
     }
 
     //funcion para el prodcuto mas barato
     function producto_menos(){
         $sql_prod="SELECT * FROM producto WHERE producto.precio = MIN(producto.precio);";
-        $result=$GLOBALS['conne']->query($sql_select);
+        $result=$GLOBALS['conne']->query($sql_prod);
         if($result->num_rows>0){
             $producto=$result->fetch_assoc();
             return $producto;
         }else{
-            return $producto;
+            return null;
         }
     }
 
@@ -219,7 +230,7 @@
     //funcion para buscar productos por precio
     function products_by_price($min, $max){
         $sql_prod="SELECT * FROM producto WHERE producto.precio BETWEEN $min AND $max;";
-        $result=$GLOBALS['conne']->query($sql_select);
+        $result=$GLOBALS['conne']->query($sql_prod);
         if($result->num_rows>0){
             return $result;
         }else{
