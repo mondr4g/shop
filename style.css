@@ -189,6 +189,7 @@ hr {
 .products, .usuarios {
     grid-column: 3/11;
     margin-top: 30px;
+    display: flex;
 }
 
 .toggle-switch {

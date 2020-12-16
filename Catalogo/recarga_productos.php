@@ -12,7 +12,7 @@
 
         if($filters->band==true){
             
-            $str_filtrado="SELECT * FROM producto NATURAL JOIN tallas WHERE";
+            $str_filtrado="SELECT * FROM producto WHERE";
             $b_first=true;
             $bb_first=true;
             if($filters->playera==true || $filters->pantalones==true || $filters->chamarra==true || $filters->sudadera==true || $filters->abrigo){
@@ -57,49 +57,56 @@
             }
             $b_first=true;
             if($filters->xs==true || $filters->s==true || $filters->m==true || $filters->l==true || $filters->xl==true){
+                $tal="";
                 if ($bb_first) {
                     $str_filtrado+=" AND";
                     $bb_first=false;
                 }
                 if($filters->xs){
+                    $tal="XS";
                     if($b_first){
                         //aplicar correcciones a query
-                        //$str_filtrado+=" JSON_CONTAINS('stock', ";
+                        $str_filtrado+=' JSON_EXTRACT(tallas,"$.XS") > 0';
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%xs%' AND stock > 0";
+
+                        $str_filtrado+=' OR JSON_EXTRACT(tallas,"$.XS")> 0';
                     }
                 }
                 if($filters->s){
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%s%'  AND stock > 0";
+                        $tal="S";
+                        $str_filtrado+=' JSON_EXTRACT(tallas,"$.S") > 0';
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%s%'  AND stock > 0";
+                        $str_filtrado+=' OR JSON_EXTRACT(tallas,"$.S") > 0';
                     }
                 }
                 if($filters->m){
+                    $tal="M";
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%m%'  AND stock > 0";
+                        $str_filtrado+=' JSON_EXTRACT(tallas,"$.M") > 0';
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR talla LIKE '%m%'  AND stock > 0";
+                        $str_filtrado+=' OR JSON_EXTRACT(tallas,"$.M") > 0';
                     }
                 }
                 if($filters->l){
+                    $tal="L";
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%l%'  AND stock > 0";
+                        $str_filtrado+=' JSON_EXTRACT(tallas,"$.L") > 0';
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR tipo LIKE '%l%'  AND stock > 0";
+                        $str_filtrado+=' OR JSON_EXTRACT(tallas,"$.L") > 0';
                     }
                 }
                 if($filters->xl){
+                    $tal="XL";
                     if($b_first){
-                        $str_filtrado+=" talla LIKE '%xl%'  AND stock > 0";
+                        $str_filtrado+=' JSON_EXTRACT(tallas,"$.XL") > 0';
                         $b_first=false;
                     }else{
-                        $str_filtrado+=" OR tipo LIKE '%xl%'  AND stock > 0";
+                        $str_filtrado+=' OR JSON_EXTRACT(tallas,"$.XL") > 0';
                     }
                 }
             }

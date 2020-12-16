@@ -19,11 +19,11 @@
                 <span class="bar"></span>
             </label>
             <ul class="nav-list">
-                <li><a href="catalogo.php">Nuevos Lanzamientos</a></li>
-                <li><a href="#media">Hombre</a></li>
-                <li><a href="#shop">Mujer</a></li>
-                <li><a href="#contact">Niño/a</a></li>
-                <li><a href="#contact">Rebajas</a></li>
+                <li><a href="Catalogo/catalogo.php">Nuevos Lanzamientos</a></li>
+                <li><a href="Catalogo/catalogo.php?categoria=hombre">Hombre</a></li>
+                <li><a href="Catalogo/catalogo.php?categoria=mujer">Mujer</a></li>
+                <li><a href="Catalogo/catalogo.php?categoria=ninos">Niño/a</a></li>
+                <li><a href="Catalogo/catalogo.php?rebajas=true">Rebajas</a></li>
                 <?php
                     if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
                 ?>

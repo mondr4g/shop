@@ -76,7 +76,6 @@
                 case 'p':
                     //Aqui traere el producto y las tallas aparte.
                     $info_prod=especific_product($_GET['id_prod']);//ya viene como un array asociado
-                    $tallas=rec_tallas($_GET['id_prod']);//este recorrelo con un foreach, si los quieres mostrar
 
 ?>
     <!--- Aqui le metes lo del formulario para el producto. --->

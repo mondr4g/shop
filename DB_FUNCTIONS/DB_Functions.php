@@ -59,6 +59,16 @@
         }
     }
 
+    //funcion que retorna un usuario
+    function select_user($id_usuario){
+        $sql_select_admin= "SELECT * FROM usuario WHERE Id_usuario = '$id_usuario' ;";
+        $ad=$GLOBALS['conne']->query($sql_select_admin);
+        if($ad->num_rows>0){
+            return $ad->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
 
     //***********************
     //Funciones para insertar nuevos usuarios
@@ -228,18 +238,6 @@
         }
     }
 
-    //recuperar tallas
-    function rec_tallas($id_product)
-    {
-        $sql_insert="SELECT * FROM tallas WHERE producto.Id_producto=".intval($id_product).";";
-        $result=$GLOBALS['conne']->query($sql_select);
-        if ($result->num_rows>0) {
-            return $result;
-        } else {
-            return null;
-        }
-    }
-    
     //funcion para el prodcuto mas caro
     function producto_mas(){
         $sql_prod="SELECT * FROM producto WHERE producto.precio = MAX(producto.precio);";
@@ -260,12 +258,40 @@
         } else {
             return null;
         }
-    }    //funcion para seleccionar productos de acuerdo a los filtros
+    }    
+    //funcion para seleccionar productos de acuerdo a los filtros
     function products_by_price($min, $max){
         $sql_prod="SELECT * FROM producto WHERE producto.precio BETWEEN $min AND $max;";
         $result=$GLOBALS['conne']->query($sql_prod);
         if($result->num_rows>0){
             return $result;
+        }else{
+            return null;
+        }
+    }
+
+    //obtener productos por categoria
+
+    function products_by_cat($cat){
+        $sql_select="SELECT * FROM producto WHERE producto.categoria LIKE '%$cat%';";
+        $result=$GLOBALS['conne']->query($sql_select);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return null;
+        }
+    }
+
+    //obtener rebajas
+    function get_rebajas(){
+        $sql_ofertas="SELECT * FROM ofertas WHERE fec_inicio <= NOW() AND fec_fin >= NOW();";
+        $result=$GLOBALS['conne']->query($sql_ofertas);
+        if($result->num_rows>0){
+            $rebajas=array();
+            foreach($result as $reb){
+                array_push($rebajas,especific_product($reb['Id_producto']));
+            }
+            return $rebajas;   
         }else{
             return null;
         }
@@ -308,7 +334,7 @@
         $sql_update="UPDATE usuario u INNER JOIN cliente c ON u.Id_usuario=c.Id_usuario SET username=".
         "'".$a_data['username']."', email='".$a_data['email']."',".
         "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
-        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_dataa['ciudad']."',colonia='".$a_data['colonia']."',".
+        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_data['ciudad']."',colonia='".$a_data['colonia']."',".
         "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
         "gustos='".$a_data['gustos']."', genero='".$a_data['genero']."' WHERE Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
@@ -323,7 +349,7 @@
         $sql_update="UPDATE usuario u INNER JOIN administrador a ON u.Id_usuario=a.Id_usuario SET username=".
         "'".$a_data['username']."', email='".$a_data['email']."',".
         "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
-        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_dataa['ciudad']."',colonia='".$a_data['colonia']."',".
+        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_data['ciudad']."',colonia='".$a_data['colonia']."',".
         "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
         " WHERE Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
@@ -357,9 +383,9 @@
     }
     //seleccionar todos los comantarios, por producto
     function select_coments_by_product($id_producto){
-        $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_producto = ".intval($id_producto)." ;";
+        $sql_select="SELECT * FROM comentarios WHERE  Id_producto=".intval($id_producto)." ;";
         $result=$GLOBALS['conne']->query($sql_select);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result;
         }else{
             return null;
@@ -369,7 +395,7 @@
     function select_coments_by_client($id_cliente){
         $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_cliente = ".intval($id_cliente)." ;";
         $result=$GLOBALS['conne']->query($sql_select);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result;
         }else{
             return null;

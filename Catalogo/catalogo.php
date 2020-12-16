@@ -1,6 +1,6 @@
 <?php
     
-    include 'carrito.php';
+    include '../Carrito/carrito.php';
 
     //Aqui agregaremos lo del catalogo de los productos
 ?>
@@ -10,9 +10,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Liverpuri Official</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" type="text/css" href="resp.css?v=<?php echo time(); ?>">
-    <script type="text/javascript" src="JS/catalog.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="../resp.css?v=<?php echo time(); ?>">
+    <script type="../text/javascript" src="../JS/catalog.js"></script>
 </head>
 <body>
 	<header>
@@ -43,7 +43,7 @@
                     }
                 ?>
             </ul>
-            <a href="#contact"><img id="shop-car" src="img/shopping_car.png" alt="shop-car"></a>
+            <a href="#contact"><img id="shop-car" src="../img/shopping_car.png" alt="shop-car"></a>
         </nav>
 	</header>	
 	<main>
@@ -84,16 +84,45 @@
             </div>
             <div class="products">
                 <?php
-                    //$productos=select_all_products();
-                    //foreach ($productos as $prod) {
+                    if(isset($_GET['categoria'])){
+                        $productos=products_by_cat($_GET['categoria']);
+                    }elseif(isset($_GET['rebajas'])){
+                        $productos=get_rebajas();
+                    }else{
+                        $productos=select_all_products();
+                    }
+                    
+                    foreach ($productos as $prod) {
                         # code...
-                      //  $imgs=json_decode($prod['imgs']);
+                        $imgs=json_decode($prod['imgs']);
                 ?> 
+                <div class="item-box">
+                        <form action="">
+                            <div class="img-item">
+                                <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
+                            </div>
+                            <div class="description">
+                                <h4 name="nombre"><?php echo $prod['nombre']?></h4>
+                                <p name="precio"><?php echo $prod['precio']?> $MXN</p>
+                                <div class="info-item">
+                                    <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
+                                    <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
+                                    <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
+                                    <input type="hidden" name="CANT" value="1">
+                                    <input type="hidden" name="talla" value="m">
+                                </div>
+                                <?php if(isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])){?>
+                                    <button class="buy" name="btnAction" value="Agregar">Add</button>
+                                <?php }?>
+                            </div>
+                        </form>
+                    </div>
+                <!--
                     <div class="item-box">
                         <form action="">
                             <div class="img-item">
                                 <a href=""><img class="imgi" src="https://img.ltwebstatic.com/images3_pi/2020/11/09/16048900530a1b8c44456c07d817aad5a8e09217d5.webp<?php //echo $prod['imgs']->principal?>" alt="item1"></a> 
-                            </div><!--El boton de añadir cada producto al carrito, metelo dentro de un formulario-->
+                            </div>
                             <div class="description">
                                 <h4 name="nombre">Producto<?php //echo $prod['nombre']?></h4>
                                 <p name="precio">$MXN568<??></p>
@@ -104,9 +133,9 @@
                                 <button class="buy" name="btnAction" value="Agregar">Add</button>
                             </div>
                         </form>
-                    </div>
+                    </div>-->
                 <?php
-                    //}
+                    }
                 ?>
             </div>
         </div>

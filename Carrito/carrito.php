@@ -2,7 +2,7 @@
     session_start();
     //Aqui se realizara el procesamiento de las variables del carrito, aqui se podran eliminar productos y agregarlos al carrito
     //haciendo uso de variables de sesion para realizar un carrito mas limpio.
-    include 'DB_FUNCTIONS/DB_Functions.php';
+    include '../DB_FUNCTIONS/DB_Functions.php';
     //variable opcional, la cual nos ayudara si es que queremos enviar alguna alerta al cliente, sobre el estado del producto 
     //agregado al carrito.
    
@@ -25,7 +25,8 @@
                         'DESC'=>$producto['descripcion'],
                         'PRECIO'=>$producto['precio'],
                         'CANT'=>$_POST['CANT'],
-                        'STOCK'=>$producto['stock']
+                        'STOCK'=>$producto['stock'],
+                        'TALLA'=>$_POST['talla']
                     );
                     $_SESSION['CARRITO'][0]=$prod;
                     $mensaje="Producto agregado";
@@ -51,7 +52,8 @@
                             'DESC'=>$producto['descripcion'],
                             'PRECIO'=>$producto['precio'],
                             'CANT'=>$_POST['CANT'],
-                            'STOCK'=>$producto['stock']
+                            'STOCK'=>$producto['stock'],
+                            'TALLA'=>$_POST['talla']
                         );
                         $_SESSION['CARRITO'][$num_prods]=$prod;
                         $mensaje="Producto agregado";
