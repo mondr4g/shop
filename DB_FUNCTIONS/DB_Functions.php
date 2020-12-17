@@ -14,12 +14,12 @@
         $result = $GLOBALS['conne']->query($sql_select);
         if ($result->num_rows > 0) {
             $usuario = $result->fetch_assoc();
-            /*if (sha1($password)!=$usuario['passw']) {
-                return null;
-            }*/
-            if ($password!=$usuario['passw']) {
+            if (sha1($password)!=$usuario['passw']) {
                 return null;
             }
+            /*if ($password!=$usuario['passw']) {
+                return null;
+            }*/
             return $usuario;
         }else{
             return $usuario;
@@ -76,17 +76,20 @@
     //insertar usuarios en general
     function insert_user($user_data){
         //$user_data['fecha']
-       
-        $nueva_fecha="";
-        $sql_insert="INSERT INTO `usuario`( `username`, `passw`, `email`, `p_nombre`, `s_nombre`, `ape_pat`, `ape_mat`, ".
-        "`fec_nac`, `telefono`, `ciudad`, `colonia`, `estado`, `calle`, `numero`, `num_interior`, `cod_postal`) VALUES ".
-        "('".$user_data['username']."','".sha1($user_data['password'])."','".$user_data['email']."',".
-        "'".$user_data['nom_1']."','".$user_data['nom_2']."','".$user_data['ape_1']."','".$user_data['ape_2']."',".
-        "'".$user_data['fec_nac']."','".$user_data['tel']."','".$user_data['ciudad']."','".$user_data['colonia']."',".
-        "'".$user_data['estado']."','".$user_data['calle']."',".intval($user_data['num_ext']).",'".$user_data['num_int']."','".$user_data['codigo']."');";
+        if (!search_user_by_usname($user_data['username'])) {
+            $nueva_fecha="";
+            $sql_insert="INSERT INTO `usuario`( `username`, `passw`, `email`, `p_nombre`, `s_nombre`, `ape_pat`, `ape_mat`, ".
+            "`fec_nac`, `telefono`, `ciudad`, `colonia`, `estado`, `calle`, `numero`, `num_interior`, `cod_postal`) VALUES ".
+            "('".$user_data['username']."','".sha1($user_data['password'])."','".$user_data['email']."',".
+            "'".$user_data['nom_1']."','".$user_data['nom_2']."','".$user_data['ape_1']."','".$user_data['ape_2']."',".
+            "'".$user_data['fec_nac']."','".$user_data['tel']."','".$user_data['ciudad']."','".$user_data['colonia']."',".
+            "'".$user_data['estado']."','".$user_data['calle']."',".intval($user_data['num_ext']).",'".$user_data['num_int']."','".$user_data['codigo']."');";
 
-        if($GLOBALS['conne']->query($sql_insert)){
-            return true;
+            if ($GLOBALS['conne']->query($sql_insert)) {
+                return true;
+            } else {
+                return false;
+            }
         }else{
             return false;
         }
@@ -109,7 +112,7 @@
     function select_all_clients(){
         $sql_select_client="SELECT * FROM usuario NATURAL JOIN cliente;";
         $result=$GLOBALS['conne']->query($sql_select_client);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result;
         }else{
             return null;
@@ -120,7 +123,7 @@
     function search_client_by_name($username){
         $sql_bus="SELECT * FROM usuario NATURAL JOIN cliente WHERE usuario.username LIKE '%$username%';";
         $result=$GLOBALS['conne']->query($sql_bus);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result->fetch_assoc();
         }else{
             return null;
@@ -131,10 +134,21 @@
     function search_admin_by_name($username){
         $sql_bus="SELECT * FROM usuario NATURAL JOIN administrador WHERE usuario.username LIKE '%$username%';";
         $result=$GLOBALS['conne']->query($sql_bus);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result->fetch_assoc();
         }else{
             return null;
+        }
+    }
+
+    //buscar usuario por username
+    function search_user_by_usname($usname){
+        $sql_select="SELECT * FROM usuario WHERE ".
+        "usuario.username='".$usname."';";
+        if($result->num_rows>0){
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -164,7 +178,7 @@
     function get_client($id_client){
         $sql_sel="SELECT * FROM usuario NATURAL JOIN cliente WHERE usuario.Id_usuario=".intval($id_client).";";
         $result=$GLOBALS['conne']->query($sql_sel);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result->fetch_assoc();
         }else{
             return null;
@@ -186,9 +200,9 @@
     //***********************
     //retorna todos los productos de la base de datos
     function select_all_products(){
-        $sql_select = "SELECT * FROM `producto` WHERE producto.status=1;";
+        $sql_select = "SELECT * FROM producto WHERE producto.status=1;";
         $result = $GLOBALS['conne']->query($sql_select);
-        if ($result->num_rows > 0) {
+        if ($result->num_rows>0) {
             return $result;
         }else{
             return null;
@@ -197,7 +211,7 @@
     //Retorna un producto de acuerdo al ID que se recibe como parametro.
     function especific_product($id_product){
         $producto=null;
-        $sql_select="SELECT * FROM producto WHERE Id_producto = ".intval($id_product).";";
+        $sql_select="SELECT * FROM producto WHERE ID_producto = ".intval($id_product).";";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows>0){
             $producto=$result->fetch_assoc();
@@ -207,36 +221,39 @@
         }
     }
     //insertar producto
-    function insert_product($p_data, $tallas){
+    function insert_product($p_data){
         //Asumimos que los datos del nuevo producto vienen definidos en un vector.
-        //se supone que la estructura de las imagenes ya viene definida como JSON.
+        //se supone que la estructura de las imagenes ya viene definida como string JSON.
+        //se supone que las tallas vienen definidas en un string JSON
         //,".doubleval($p_data['precio']).",".intval($p_data['stock']).",
-        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`,`precio`, `marca`, `tipo`, ".
+        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`,`precio`, `marca`, `tipo`, `tallas`".
         "`Fecha_lanzamiento`, `categoria`, `imgs`, `status`) VALUES ".
-        "('".$p_data['nombre']."','".$p_data['detal']."',".doubleval($p_data['precio']).",'".$p_data['marca']."',".
-        "'".$p_data['tipo']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
+        "('".$p_data['nombre']."','".$p_data['detalles']."',".doubleval($p_data['precio']).",'".$p_data['marca']."',".
+        "'".$p_data['tipo']."','".$p_data['tallas']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
 
         if($GLOBALS['conne']->query($sql_insert)){
-            $res="SELECT MAX(usuario.Id_usuario) as id FROM usuario;";
-            $r=$GLOBALS['conne']->query($res);
-            $id=$r->fetch_assoc();
-            foreach($tallas as $talla){
-                insertar_talla( $id['id'], $talla['talla'], $talla['stock']);
-            }
             return true;
         }else{
             return false;
         }
     }
 
-    function insertar_talla($id_product,$talla,$stock){
-        $sql_insert="INSERT INTO `descripcion_producto` (`Id_producto`,`stock`,`talla`) VALUES (".intval($id_product).", ".intval($stock).", '$talla');";
-        if($GLOBALS['conne']->query($sql_insert)){
+    //Actualizar producto
+    function update_producto($prod_data){
+        //se actualiza todo excepto la fecha de lanzamiento
+        $sql_updt="UPDATE producto SET ".
+        "nombre ='".$prod_data['nombre']."',".
+        "detalles='".$prod_data['detalles']."',precio=".doubleval($prod_data['precio']).",marca='".$prod_data['marca']."'".
+        ",tipo='".$prod_data['tipo']."',tallas='".$prod_data['tallas']."',categoria='".$prod_data['categoria']."'".
+        ",imgs='".$prod_data['imgs']."',status=".intval($prod_data['status'])." WHERE ID_producto=".intval($prod_data['id']).";";
+        if($GLOBALS['conne']->query($sql_updt)){
             return true;
         }else{
             return false;
         }
     }
+
+
 
     //funcion para el prodcuto mas caro
     function producto_mas(){
@@ -297,18 +314,51 @@
         }
     }
 
-
-
-    //funcion para manejar el stock del producto
-    function product_stock($id_prod){
-        $sql_prod_stock="SELECT producto.ID_producto, SUM(tallas.stock) as Stock_tot FROM producto NATURAL JOIN tallas WHERE producto.ID_producto=$id_prod;";
-        $result=$GLOBALS['conne']->query($sql_prod_stock);
+    //obtener nuevos lanzamientos
+    function get_newProds(){
+        $sql_news="SELECT * FROM producto WHERE MONTH(fecha_lanzamiento) = MONTH(CURDATE());";
+        $result=$GLOBALS['conne']->query($sql_news);
         if($result->num_rows>0){
             return $result;
         }else{
             return null;
         }
-    }    
+    }
+
+
+
+    //funcion para retornar el stock dependiendo de la talla que reciba
+    function product_stock($id_prod, $talla){
+
+        $sql_prod_stock="SELECT JSON_EXTRACT(tallas,'$.$talla') WHERE producto.ID_producto = ".intval($id_prod)." ;";
+        $result=$GLOBALS['conne']->query($sql_prod_stock);
+        if($result){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    //obtener los productos relacionados con los gustos del cliente
+    function prods_relacionados($id_cliente){
+        //Aqui recuperamos el cliente
+        $sql_cat="SELECT cliente.genero FROM cliente WHERE Id_cliente=".intval($id_cliente).";";
+        $res=$GLOBALS['conne']->query($sql_cat);
+        $cat=$res->fetch_assoc();
+        $oc=$cat['genero'];
+        //Aca recuperamos los productos
+        $sql_sel="SELECT * FROM producto WHERE producto.status=1 AND producto.categoria='$oc' LIMIT 4;";//Aqui podria agregar mas campos, si espedificamos de mejor manera.
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+    
+    //********************** 
+    //Para las compras
     //***********************
     function new_sale($data_compra){
         $sql_insert="INSERT INTO `compra`(`Id_cliente`, `total`) VALUES (".intval($data_compra['cliente']).",".doubleval($data_compra['total']).");";
@@ -329,14 +379,38 @@
         }
     }
 
+    //insertar detalle de compra
+    function new_sale_detail($id_compra, $prods){
+        //$prods es un array que contiene el id del producto, la talla y la cantidad.
+        $sql_insert="INSERT INTO `detalle_compra`(".inval($id_compra).",".intval($prods['Id_producto']).",".intval($prods['cant']).",`".$prods['talla']."`); ";
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //retornar los productos comprados detalle de compra
+    function sale_details($id_compra){
+        $sql_sel="SELECT * FROM detalle_compra WHERE Id_compra = ".intval($id_compra).";";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return null;
+        }
+
+    }
+
+    //UPDATE `usuario` as u NATURAL JOIN cliente as c SET `num_interior`='A6', c.genero='Hombre' WHERE Id_usuario=1
     //faltan
     function modify_cliente($a_data){
-        $sql_update="UPDATE usuario u INNER JOIN cliente c ON u.Id_usuario=c.Id_usuario SET username=".
-        "'".$a_data['username']."', email='".$a_data['email']."',".
-        "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
-        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_data['ciudad']."',colonia='".$a_data['colonia']."',".
-        "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
-        "gustos='".$a_data['gustos']."', genero='".$a_data['genero']."' WHERE Id_usuario=".intval($a_data['id'])." ;";
+        $sql_update="UPDATE usuario AS u INNER JOIN cliente AS c ON u.Id_usuario=c.Id_usuario SET u.username=".
+        "'".$a_data['username']."', u.email='".$a_data['email']."',".
+        "u.p_nombre='".$a_data['nom_1']."',u.s_nombre='".$a_data['nom_2']."',u.ape_pat='".$a_data['ape_1']."',u.ape_mat='".$a_data['ape_2']."',".
+        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',u.ciudad='".$a_data['ciudad']."',u.colonia='".$a_data['colonia']."',".
+        "u.estado='".$a_data['estado']."',u.calle='".$a_data['calle']."',u.numero=".intval($a_data['num_ext']).",u.num_interior='".$a_data['num_int']."',u.cod_postal='".$a_data['codigo']."', ".
+        "c.gustos='".$a_data['gustos']."', c.genero='".$a_data['genero']."' WHERE u.Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
             return true;
         }else{
@@ -347,11 +421,11 @@
 
     function modify_admin($a_data){
         $sql_update="UPDATE usuario u INNER JOIN administrador a ON u.Id_usuario=a.Id_usuario SET username=".
-        "'".$a_data['username']."', email='".$a_data['email']."',".
-        "p_nombre='".$a_data['nom_1']."',s_nombre='".$a_data['nom_2']."',ape_pat='".$a_data['ape_1']."',ape_mat='".$a_data['ape_2']."',".
-        "fec_nac='".$a_data['fec_nac']."',telefono='".$a_data['tel']."',ciudad='".$a_data['ciudad']."',colonia='".$a_data['colonia']."',".
-        "estado='".$a_data['estado']."',calle='".$a_data['calle']."',numero=".intval($a_data['num_ext']).",num_interior='".$a_data['num_int']."',cod_postal'".$a_data['codigo']."', ".
-        " WHERE Id_usuario=".intval($a_data['id'])." ;";
+        "'".$a_data['username']."', u.email='".$a_data['email']."',".
+        "u.p_nombre='".$a_data['nom_1']."',u.s_nombre='".$a_data['nom_2']."',u.ape_pat='".$a_data['ape_1']."',u.ape_mat='".$a_data['ape_2']."',".
+        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',u.ciudad='".$a_data['ciudad']."',u.colonia='".$a_data['colonia']."',".
+        "u.estado='".$a_data['estado']."',u.calle='".$a_data['calle']."',u.numero=".intval($a_data['num_ext']).",u.num_interior='".$a_data['num_int']."',u.cod_postal='".$a_data['codigo']."' ".
+        " WHERE u.Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
             return true;
         }else{
@@ -383,7 +457,7 @@
     }
     //seleccionar todos los comantarios, por producto
     function select_coments_by_product($id_producto){
-        $sql_select="SELECT * FROM comentarios WHERE  Id_producto=".intval($id_producto)." ;";
+        $sql_select="SELECT * FROM comentarios WHERE  Id_producto=".intval($id_producto)." ORDER BY fecha DESC ;";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows>0){
             return $result;
@@ -393,7 +467,7 @@
     }
     //Seleccionar comentarios por cliente
     function select_coments_by_client($id_cliente){
-        $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_cliente = ".intval($id_cliente)." ;";
+        $sql_select="SELECT * FROM comentarios WHERE  comentarios.Id_cliente = ".intval($id_cliente)." ORDER BY fecha DESC ;";
         $result=$GLOBALS['conne']->query($sql_select);
         if($result->num_rows>0){
             return $result;
@@ -402,6 +476,23 @@
         }
     }
     //eliminar un comentario
+    function delete_coment($data_coment){
+        //este array de $data_coment debe de tener la estructura
+        /*
+            Id_cliente => 
+            Id_producto =>
+            fecha =>
+        */ 
+        $sql_del="DELETE FROM comentarios WHERE ".
+        "fecha='".$data_coment['fecha']."' AND Id_cliente=".intval($data_coment['Id_cliente'])." AND Id_producto=".intval($data_coment['Id_producto']).";";
+        //DELETE FROM `comentarios` WHERE fecha="2020-12-15 22:48:07" AND Id_cliente=15 AND Id_producto=4
+        $result=$GLOBALS['conne']->query($sql_del);
+        if($result->num_rows>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     //***********************
     //Funciones para los ofertas

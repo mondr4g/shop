@@ -7,8 +7,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Liverpuri Official</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" type="text/css" href="resp.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="CSS/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="CSS/resp.css?v=<?php echo time(); ?>">
 </head>
 <body>
 	<header>
@@ -19,7 +19,7 @@
                 <span class="bar"></span>
             </label>
             <ul class="nav-list">
-                <li><a href="Catalogo/catalogo.php">Nuevos Lanzamientos</a></li>
+                <li><a href="Catalogo/catalogo.php?nuevos=true">Nuevos Lanzamientos</a></li>
                 <li><a href="Catalogo/catalogo.php?categoria=hombre">Hombre</a></li>
                 <li><a href="Catalogo/catalogo.php?categoria=mujer">Mujer</a></li>
                 <li><a href="Catalogo/catalogo.php?categoria=ninos">Niño/a</a></li>
@@ -27,14 +27,14 @@
                 <?php
                     if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
                 ?>
-                <li><a href="login.php">Sign in</a></li>
+                <li><a href="Sesiones/login.php">Sign in</a></li>
                 <?php
                     }
                 ?>
                 <?php
                     if (isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])) {      
                 ?>
-                <li><a href="logout.php">Sing out</a></li>
+                <li><a href="Sesiones/logout.php">Sing out</a></li>
                 <?php
                     }
                 ?>
@@ -58,7 +58,7 @@
                         No te pierdas los nuevos lanzamientos <br>
                         de temporada.
                     </p>
-                    <button>Nuevos Lanzamientos</button>
+                    <button><a href="Catalogo/catalogo.php?nuevos=true">Nuevos Lanzamientos</a></button>
                 </div>
                 <div class="img-cont">
                     <img src="img/new.jpg" alt="new">
@@ -71,16 +71,16 @@
                 </div>
                 <div class="container-box">
                     <div class="card">
-                        <a href=""><img src="img/men.jpg" alt="Hombres"></a> 
-                        <p>Hombre</p>
+                        <img src="img/men.jpg" alt="Hombres">
+                        <a href="Catalogo/catalogo.php?categoria=hombre"><p>Hombre</p></a> 
                     </div>
                     <div class="card">
-                        <a href=""><img src="img/women.jpg" alt="Mujeres"></a> 
-                        <p>Mujer</p>
+                        <img src="img/women.jpg" alt="Mujeres">
+                        <a href="Catalogo/catalogo.php?categoria=mujer"><p>Mujer</p></a> 
                     </div>
                     <div class="card">
-                        <a href=""><img src="img/kids.jpg" alt="Kids"></a> 
-                        <p>Niño/a</p>
+                        <img src="img/kids.jpg" alt="Kids">
+                        <a href="Catalogo/catalogo.php?categoria=ninos"><p>Niño/a</p></a> 
                     </div>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                         No te pierdas las rebajas <br>
                         de hasta 50% de descuento.
                     </p>
-                    <button>Ver mas</button>
+                    <button><a href="Catalogo/catalogo.php?rebajas=true">Ver mas</a></button>
                 </div>    
             </div>
 		</div>	

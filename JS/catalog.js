@@ -19,7 +19,8 @@ function getFilter() {
     let xl = document.getElementById('xl');
     let iprice = document.getElementById('iprice').value;
     let fprice = document.getElementById('fprice').value;
-
+    let category = document.getElementById('cat').value;
+    let rebajas = document.getElementById('reb').value;
     let filter = '{';
     let all = false;
 
@@ -27,73 +28,100 @@ function getFilter() {
         all = true;
 
     if(playera.checked) 
-        filter += ' "playera" : "true", ';
+        filter += ' "playera" : true, ';
     else
-        filter += ' "playera" : "false", ';
+        filter += ' "playera" : false, ';
 
     if(pantalon.checked) 
-        filter += ' "pantalon" : "true", ';
+        filter += ' "pantalon" : true, ';
     else
-        filter += ' "pantalon" : "false", ';
+        filter += ' "pantalon" : false, ';
 
     if(chamarra.checked) 
-        filter += ' "chamarra" : "true", ';
+        filter += ' "chamarra" : true, ';
     else
-        filter += ' "chamarra" : "false", ';
+        filter += ' "chamarra" : false, ';
         
     if(sudadera.checked) 
-        filter += ' "sudadera" : "true", ';
+        filter += ' "sudadera" : true, ';
     else
-        filter += ' "accesorio" : "false", ';
+        filter += ' "sudadera" : false, ';
     
     if(abrigo.checked) 
-        filter += ' "abrigo" : "true", ';
+        filter += ' "abrigo" : true, ';
     else
-        filter += ' "abrigo" : "false", ';
+        filter += ' "abrigo" : false, ';
 
     if(xs.checked) 
-        filter += ' "xs" : "true", ';
+        filter += ' "XS" : true, ';
     else
-        filter += ' "xs" : "false", ';
+        filter += ' "XS" : false, ';
 
     if(s.checked) 
-        filter += ' "s" : "true", ';
+        filter += ' "S" : true, ';
     else
-        filter += ' "s" : "false", ';
+        filter += ' "S" : false, ';
         
     if(m.checked) 
-        filter += ' "m" : "true", ';
+        filter += ' "M" : true, ';
     else
-        filter += ' "m" : "false", ';
+        filter += ' "M" : false, ';
         
     if(l.checked) 
-        filter += ' "l" : "true", ';
+        filter += ' "L" : true, ';
     else
-        filter += ' "l" : "false", ';
+        filter += ' "L" : false, ';
         
     if(xl.checked) 
-        filter += ' "xl" : "true", ';
+        filter += ' "XL" : true, ';
     else
-        filter += ' "xl" : "false", ';
+        filter += ' "XL" : false, ';
         
     filter += ' "minPrice" : ' + iprice + ', ';
     filter += ' "maxPrice" : ' + fprice + ', ';
-    filter += ' "band" : ' + all + ' }';
-    let obj = JSON.parse(filter);
 
+    if(category != "")
+        filter += ' "categoria" : "' + category + '", ';
+    else
+        filter += ' "categoria" : "null", '; 
+
+    if(rebajas == "true") 
+        filter += ' "rebajas" : ' + rebajas + ', ';
+    else
+        filter += ' "rebajas" : false, ';
+
+    filter += ' "band" : ' + all + ' }';
+    let obj = filter;
+    console.log(obj);
     getRequest(obj);
 }
 
 function getRequest(data) {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "recarga_productos.php");
+    xhr.open("POST", "../Catalogo/recarga_productos.php", true);
     xhr.onreadystatechange = function() {
         if(xhr.readyState == 4 && xhr.status == 200) {
-            console.log(xhr.responseText);    
+            console.log(xhr.responseText);
+            document.getElementById('prod').innerHTML = xhr.responseText;
         }
     };
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.send("json=" + JSON.stringify(data));
+    xhr.send("json=" + data);
+}
+
+
+function getRequestComment() {
+    let com = document.getElementById('newCommentario').value;
+    let id = document.getElementById('id_prod').value;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "../Catalogo/new_comment.php", true);
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById('comentarios').innerHTML = xhr.responseText;
+        }
+    };
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send("id_prod=" + id + "&newComment=" + com);
 }
 
 function masCant() {
@@ -106,7 +134,8 @@ function masCant() {
     }
     else
         document.getElementById('msgCant').innerHTML = "Max 10 articulos por compra";
-
+    
+    document.getElementById('CANT').value = value;
     document.getElementById('cant').innerHTML = value;    
 }
 
@@ -121,6 +150,7 @@ function menosCant() {
     else
         document.getElementById('msgCant').innerHTML = "Min 1 articulos por compra";
 
+    document.getElementById('CANT').value = value;
     document.getElementById('cant').innerHTML = value;      
 }
 

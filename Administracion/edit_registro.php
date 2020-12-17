@@ -12,7 +12,7 @@
             switch($_POST['tipo']){
                 case 'u';
                     $user_data=array(
-                        "id"=>$$_POST['id_us'],
+                        "id"=>$_POST['id_us'],
                         "username" => $_POST['txtusr'],
                         "password" => $_POST['txtpasswd'],
                         "nom_1" => $_POST['nom1'],
@@ -46,6 +46,21 @@
                 
                 case 'p':
                     # code...
+                    $tallas='{"XS":'.$_POST['XS'].',"S":'.$_POST['S'].',"M":'.$_POST['M'].',"L":'.$_POST['L'].',"XL":'.$_POST['XL'].'}';
+                    $ims='{"I1":"'.$_POST['img1'].'", "I2":"'.$_POST['img2'].'","I3":"'.$_POST['img3'].'"}';
+                    $prod_daaaa=array();
+                    $prod_daaaa+=["id"=>$_POST['id_us']];
+                    $prod_daaaa+=["nombre" => $_POST['nombre']];
+                    $prod_daaaa+=["detalles" => $_POST['detalles']];
+                    $prod_daaaa+=["precio" => $_POST['precio']];
+                    $prod_daaaa+=["marca" => $_POST['marca']];
+                    $prod_daaaa+=["tipo" => $_POST['tipo']];
+                    $prod_daaaa+=["tallas" => $tallas];
+                    $prod_daaaa+=["categoria" => $_POST['categoria']];
+                    $prod_daaaa+=["imgs" => $imgs];
+                    $prod_daaaa+=["status"=> $_POST['status']];
+
+                    
 
                     break;
             }

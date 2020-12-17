@@ -10,35 +10,35 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Liverpuri Official</title>
-    <link rel="stylesheet" type="text/css" href="../style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" type="text/css" href="../resp.css?v=<?php echo time(); ?>">
-    <script type="../text/javascript" src="../JS/catalog.js"></script>
+    <link rel="stylesheet" type="text/css" href="../CSS/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="../CSS/resp.css?v=<?php echo time(); ?>">
+    <script type="text/javascript" src="../JS/catalog.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
 	<header>
         <nav>
-            <h1 class="logo">LiverPuri</h1>
+            <a id="main-logo" href="../index.php"><h1 class="logo">LiverPuri</h1></a>
             <input type="checkbox" id="hamburguer-toggle">
             <label for="hamburguer-toggle" class="hamburguer">
                 <span class="bar"></span>
             </label>
             <ul class="nav-list">
-                <li><a href="#about-us">Nuevos Lanzamientos</a></li>
-                <li><a href="#media">Hombre</a></li>
-                <li><a href="#shop">Mujer</a></li>
-                <li><a href="#contact">Niño/a</a></li>
-                <li><a href="#contact">Rebajas</a></li>
+                <li><a href="catalogo.php?nuevos=true">Nuevos Lanzamientos</a></li>
+                <li><a href="catalogo.php?categoria=hombre">Hombre</a></li>
+                <li><a href="catalogo.php?categoria=mujer">Mujer</a></li>
+                <li><a href="catalogo.php?categoria=ninos">Niño/a</a></li>
+                <li><a href="catalogo.php?rebajas=true">Rebajas</a></li>
                 <?php
                     if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
                 ?>
-                <li><a href="login.php">Sign in</a></li>
+                <li><a href="../Sesiones/login.php">Sign in</a></li>
                 <?php
                     }
                 ?>
                 <?php
                     if (isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])) {      
                 ?>
-                <li><a href="logout.php">Sing out</a></li>
+                <li><a href="../Sesiones/logout.php">Sing out</a></li>
                 <?php
                     }
                 ?>
@@ -49,6 +49,22 @@
 	<main>
         <div class="home-grid">
             <div class="filter" onchange="getFilter()">
+                    <div id="category">
+                        <?php 
+                            if(isset($_GET['categoria']))
+                                echo "<input type='text' id='cat' value='" . $_GET['categoria'] . "'>";
+                            else
+                                echo "<input type='text' id='cat'>";  
+                        ?>
+                    </div>
+                    <div id="rebajas">
+                        <?php 
+                            if(isset($_GET['rebajas']))
+                                echo "<input type='text' id='reb' value='" . $_GET['rebajas'] . "'>";
+                            else
+                                echo "<input type='text' id='reb'>"; 
+                        ?>
+                    </div>
                     <div class="input-group">
                         <h3>Articulo</h3>
                         <input type="checkbox" value="Playera" id="playera" name="playera"> Playeras <br>
@@ -82,58 +98,48 @@
                         </datalist>
                     </div>
             </div>
-            <div class="products">
+            <div class="products" id="prod">
                 <?php
                     if(isset($_GET['categoria'])){
                         $productos=products_by_cat($_GET['categoria']);
                     }elseif(isset($_GET['rebajas'])){
                         $productos=get_rebajas();
+                    }elseif(isset($_GET['nuevos'])){
+                        $productos=get_newProds();
                     }else{
                         $productos=select_all_products();
                     }
-                    
-                    foreach ($productos as $prod) {
-                        # code...
-                        $imgs=json_decode($prod['imgs']);
-                ?> 
-                <div class="item-box">
-                        <form action="">
-                            <div class="img-item">
-                                <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
+
+                    if ($productos) {
+                        foreach ($productos as $prod) {
+                            # code...
+                            $imgs=json_decode($prod['imgs']); ?> 
+                            <div class="item-box">
+                                <form action="">
+                                    <div class="img-item">
+                                        <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
+                                    </div>
+                                    <div class="description">
+                                        <h4 name="nombre"><?php echo $prod['nombre']?></h4>
+                                        <p name="precio"><?php echo $prod['precio']?> $MXN</p>
+                                        <div class="info-item">
+                                            <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
+                                            <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
+                                            <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
+                                            <input type="hidden" name="CANT" value="1">
+                                            <input type="hidden" name="talla" value="M">
+                                        </div>
+                                        <?php if (isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])) {?>
+                                            <button class="buy" name="btnAction" value="Agregar">Add</button>
+                                        <?php } ?>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="description">
-                                <h4 name="nombre"><?php echo $prod['nombre']?></h4>
-                                <p name="precio"><?php echo $prod['precio']?> $MXN</p>
-                                <div class="info-item">
-                                    <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
-                                    <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
-                                    <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
-                                    <input type="hidden" name="CANT" value="1">
-                                    <input type="hidden" name="talla" value="m">
-                                </div>
-                                <?php if(isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])){?>
-                                    <button class="buy" name="btnAction" value="Agregar">Add</button>
-                                <?php }?>
-                            </div>
-                        </form>
-                    </div>
-                <!--
-                    <div class="item-box">
-                        <form action="">
-                            <div class="img-item">
-                                <a href=""><img class="imgi" src="https://img.ltwebstatic.com/images3_pi/2020/11/09/16048900530a1b8c44456c07d817aad5a8e09217d5.webp<?php //echo $prod['imgs']->principal?>" alt="item1"></a> 
-                            </div>
-                            <div class="description">
-                                <h4 name="nombre">Producto<?php //echo $prod['nombre']?></h4>
-                                <p name="precio">$MXN568<??></p>
-                                <div class="info-item">
-                                    <p name="ID"></p>
-                                    <p name="CANT"></p>
-                                </div>
-                                <button class="buy" name="btnAction" value="Agregar">Add</button>
-                            </div>
-                        </form>
-                    </div>-->
+                <?php
+                        }
+                    }else{
+                ?>
+                    <!--Aqui ponle un msj bien vrgas de que no hay-->
                 <?php
                     }
                 ?>

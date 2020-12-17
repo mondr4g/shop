@@ -15,8 +15,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Liverpuri Official</title>
-    <link rel="stylesheet" type="text/css" href="../style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" type="text/css" href="../resp.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="../CSS/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" type="text/css" href="../CSS/resp.css?v=<?php echo time(); ?>">
     <script type="text/javascript">
         window.onload = function() {
             checkView();
