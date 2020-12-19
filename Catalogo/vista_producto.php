@@ -26,6 +26,27 @@
                 <li><a href="catalogo.php?categoria=ninos">Niño/a</a></li>
                 <li><a href="catalogo.php?rebajas=true">Rebajas</a></li>
                 <?php
+                    if (isset($_SESSION['admin_on'])) {      
+                ?>
+                    <li><a href="../Administracion/index_admin.php">Admin</a></li>
+                <?php
+                    }
+                ?>
+                <?php
+                    if (isset($_SESSION['client_on'])) {      
+                ?>
+                    <li><a href="../Chat/chat.php">Chat</a></li>
+                <?php
+                    }
+                ?>
+                <?php
+                    if (isset($_SESSION['admin_on'])) {      
+                ?>
+                    <li><a href="../Administracion/chat_admin.php">Chat</a></li>
+                <?php
+                    }
+                ?>
+                <?php
                     if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
                 ?>
                 <li><a href="../Sesiones/login.php">Sign in</a></li>
@@ -40,7 +61,7 @@
                     }
                 ?>
             </ul>
-            <a href="#contact"><img id="shop-car" src="../img/shopping_car.png" alt="shop-car"></a>
+            <a href="../Carrito/mostrar_carrito.php"><img id="shop-car" src="../img/shopping_car.png" alt="shop-car"></a>
         </nav>
 	</header>	
 	<main>
@@ -73,7 +94,7 @@
                                     if($to>0){
                             ?>  
                                     
-                                    <input type="radio" value="<?php echo $key ?>" id="talla" name="talla"> <?php echo $key ?>
+                                    <input type="radio" value="<?php echo $key ?>" id="tallas2" name="talla" checked> <?php echo $key ?>
                             <?php
                                     }
                                 }
@@ -93,7 +114,7 @@
                         </div>
                         <br>
                         <?php
-                            echo $mensaje; 
+                            //echo $mensaje; 
                             if(isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])){?>
                             <input type="hidden" name="ID" id="ID" value="<?php echo $prod['ID_producto']?>">
                             <input type="hidden" name="CANT" id="CANT"><!--Me falta sacar este valor, del label de arriba no se como xdxd-->
@@ -126,9 +147,6 @@
                                 <input type="hidden" name="CANT" value="1">
                                 <input type="hidden" name="talla" value="M">
                             </div>
-                            <?php if (isset($_SESSION['admin_on']) || isset($_SESSION['client_on'])) {?>
-                                <button class="buy" name="btnAction" value="Agregar">Add</button>
-                            <?php } ?>
                         </div>
                     </form>
                 </div>

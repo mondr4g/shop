@@ -3,6 +3,7 @@
     //Aqui se realizara el procesamiento de las variables del carrito, aqui se podran eliminar productos y agregarlos al carrito
     //haciendo uso de variables de sesion para realizar un carrito mas limpio.
     include '../DB_FUNCTIONS/DB_Functions.php';
+    include 'ticket.php';
     //variable opcional, la cual nos ayudara si es que queremos enviar alguna alerta al cliente, sobre el estado del producto 
     //agregado al carrito.
    
@@ -10,12 +11,12 @@
 
     //tanto los botones de agregar al carrito, como eliminar del carrito, deben de tener este nombre, solo cambiara el valor que lleven
     //Asi tendremos todo esto  ya mas comunicado 
-    $mensaje="IMPRIME DE CARRITO";
+    //$mensaje="IMPRIME DE CARRITO";
     if(isset($_POST['btnAction'])){
-        $mensaje="LLEGO AL BTN";
+        //$mensaje="LLEGO AL BTN";
         switch($_POST['btnAction']){
             case 'Agregar':
-                $mensaje=$mensaje."ENTRO A AGREGAR";
+                //$mensaje=$mensaje."ENTRO A AGREGAR";
                 if(!isset($_SESSION['CARRITO'])){
                     //SOLO MANEJARE ESTOS ATRIBUTOS DEL PRODUCTO YA QUE NO QUIERO GUARDAR TODO EL REGISTRO COMPLETO EN LA VARIABLE
                     //DE SESION, CREO QUE ES MEJOR SOLO TOMAR LOS ATRIBUTOS QUE SERVIRAN PARA LAS CUENTAS Y PARA IDENTIFICAR EL PRODUCTO
@@ -27,11 +28,11 @@
                         'DESC'=>$producto['detalles'],
                         'PRECIO'=>doubleval($producto['precio']),
                         'CANT'=>intval($_POST['CANT']),
-                        'STOCK'=>product_stock($_POST['ID'],$_POST['talla']),
                         'TALLA'=>$_POST['talla']
                     );
                     $_SESSION['CARRITO'][0]=$prod;
-                    $mensaje=$mensaje."PRODUCTO AGREGADO";
+                    //$mensaje=$mensaje."PRODUCTO AGREGADO";
+                    echo "<script>alert('PRODUCTO AGREGADO')</script>";
                 }else{
                     $id_prods=array_column($_SESSION['CARRITO'],'ID');
                 
@@ -40,54 +41,65 @@
                         //las alertas que puse se pueden borrar ya que no se requieren.
                         $obj=null;
                         $keyy=null;
+
+                        $ob2=null;
+                        $keey2=null;
                         foreach($_SESSION['CARRITO'] as $key=>$prod){
-                            if($prod['ID']==$_POST['ID'] && $prod['TALLA']==$_POST['TALLA'] && ($obj['STOCK']-$_POST['CANT'])>0){
+                            if($prod['ID']==$_POST['ID'] && $prod['TALLA']==$_POST['talla'] ){
                                 $obj=$prod;
                                 $keyy=$key;
-                                
+                                $obj['CANT']=intval($obj['CANT'])+intval($_POST['CANT']);
+                                $_SESSION['CARRITO'][$keyy]=$obj;
+                                echo "<script>alert('SE HA ACTUALIZADO LA CANTIDAD')</script>";
                                 break;
                             }
+                            /*if($prod['ID']==$_POST['ID'] && $prod['TALLA']!=$_POST['talla']){
+                                $ob2=$prod;
+                                $keey2=$key;
+                            }*/
                         }
-//corregir esto hijo de la verga
-
-                            $obj['CANT']=intval($prod['CANT'])+$_POST['CANT'];
-                            $_SESSION['CARRITO'][$keyy]=$obj;
-
-
-                            if($obj['TALLA']!=$_POST['talla']){
-                                $num_prods=count($_SESSION['CARRITO']);
-                                $producto=especific_product($_POST['ID']);
-                                $prod=array(
+//corregir esto hijo de la verga 
+                        if($obj==null){
+                            $num_prods=count($_SESSION['CARRITO']);
+                            $producto=especific_product($_POST['ID']);
+                            
+                                $produ=array(
                                     'ID'=>$_POST['ID'],
                                     'NOMBRE'=>$producto['nombre'],
                                     'DESC'=>$producto['detalles'],
                                     'PRECIO'=>doubleval($producto['precio']),
                                     'CANT'=>intval($_POST['CANT']),
-                                    'STOCK'=>product_stock($_POST['ID'],$_POST['talla']),
                                     'TALLA'=>$_POST['talla']
                                 );
-                                $_SESSION['CARRITO'][$num_prods]=$prod;
-                               
-                            }
+                                $_SESSION['CARRITO'][$num_prods]=$produ;
+                                echo "<script>alert('PRODUCTO AGREGADO')</script>";
+                                
+                        }
+                           
+                            
+                        
                             //echo "<script>alert('YA NO HAY MAS EN STOCK')</script>";//si se termina el stock entonces envia este mensaje
                         
                         //echo "<script>alert('El producto ya ha sido agregado')</script>";
-                        $mensaje="";
+                        //$mensaje="";
                     }else{
                         //Aqui se agrega un producto nuevo.
                         $num_prods=count($_SESSION['CARRITO']);
                         $producto=especific_product($_POST['ID']);
-                        $prod=array(
-                            'ID'=>$_POST['ID'],
-                            'NOMBRE'=>$producto['nombre'],
-                            'DESC'=>$producto['detalles'],
-                            'PRECIO'=>doubleval($producto['precio']),
-                            'CANT'=>intval($_POST['CANT']),
-                            'STOCK'=>product_stock($_POST['ID'],$_POST['talla']),
-                            'TALLA'=>$_POST['talla']
-                        );
-                        $_SESSION['CARRITO'][$num_prods]=$prod;
-                        $mensaje="Producto agregado 2";
+                        $prod_stoc=product_stock($_POST['ID'],$_POST['talla']);
+
+                       
+                            $prod=array(
+                                'ID'=>$_POST['ID'],
+                                'NOMBRE'=>$producto['nombre'],
+                                'DESC'=>$producto['detalles'],
+                                'PRECIO'=>doubleval($producto['precio']),
+                                'CANT'=>intval($_POST['CANT']),
+                                'TALLA'=>$_POST['talla']
+                            );
+                            $_SESSION['CARRITO'][$num_prods]=$prod;
+                            echo "<script>alert('PRODUCTO AGREGADO')</script>";
+                        
                     }
                 }
                 break;
@@ -102,46 +114,99 @@
                 }
                 break;
             
-            case 'Cant_MAS':
+            case 'Comprar':
+                //AQUI FALTA HACER LA COMPRA
+
+                if(isset($_SESSION['CARRITO'])){
+                    //Aqui la idea que traia el mena de mandar el pantallazo y el correo al admin
+
+                    
+                    //Aqui ingresaremos la compra a la BD
+                    $compra=new_sale($_SESSION['client_on'],$_POST['total']);
+
+                    $cliente=select_user($_SESSION['client_on']);
+                    //Aqui se ingresaran todos los productos que se compraron
+                    $b=true;
+                    //echo $compra; 
+                    foreach ($_SESSION['CARRITO'] as $key => $prod) {
+                        # code...
+                        if(new_sale_detail($compra,$prod['ID'],$prod['CANT'],$prod['TALLA'])){
+                            actualiza_stock($prod['ID'],$prod['TALLA'],$prod['CANT']);
+                            $b=true;
+                        }else{
+                            $b=false;
+                        }
+
+                    }
+
+                    if($b){
+                        $compr=get_sale($compra);
+                        //compra registrada exitosamente
+                        sendMail($cliente['email'],$compra,$_POST['total']);
+                        $admin=select_sales_admin();
+                        $data=array(
+                            "USERNAME" =>$cliente['username'],
+                            "ID_COMPRA"=>$compra,
+                            "TOTAL"=>$_POST['total'],
+                            "FECHA"=>$compr['fecha_compra']
+                        );
+                        sendMailAdmin($admin['email'],$data);
+                        //unlink('../api/Captura.png');
+                        unset($_SESSION['CARRITO']);
+                    }else{
+                        //nah
+                    }
+                }
+               
+                break;
+            
+            case 'mas':
                 $ID=$_POST['ID'];
                 if($_POST['ID']){
                     $op=null;
                     $ke=null;
                     foreach($_SESSION['CARRITO'] as $indice=>$prod){
                         if($prod['ID']==$ID && $prod['TALLA']==$_POST['TALLA']){
-                            //echo "si entre perro";
-                            $prod['CANT']++;
-                            $op=$prod;
-                            $ke=$indice;
-                            break;
-                            //echo "<script>alert('elemento AGREGADO');</script>";
+                            $stock=product_stock($prod['ID'],$prod['TALLA']);
+                            if(intval($prod['CANT']) < intval($stock['STOCK'])){
+                                $prod['CANT']=intval($prod['CANT'])+1;
+                                //echo intval($prod['CANT'])+1;
+                                $op=$prod;
+                                $ke=$indice;
+                                $_SESSION['CARRITO'][$ke]=$op;
+                                //echo $prod['CANT'];
+                            }else{
+                                //echo "no mms";
+                            }
                         }
                     }
-                    $_SESSION['CARRITO'][$ke]=$op;
+                    //$_SESSION['CARRITO'][$ke]=$op;
 
                 }
                 break;
-            case 'Cant_MENOS':
-                $ID=$_POST['ID'];
+    
+            case 'menos':
+               $ID=$_POST['ID'];
                 if($_POST['ID']){
                     $op=null;
                     $ke=null;
                     foreach($_SESSION['CARRITO'] as $indice=>$prod){
                         if($prod['ID']==$ID && $prod['TALLA']==$_POST['TALLA']){
                             
-                            if ($prod['CANT']>1) {
-                                $prod['CANT']--;
+                            if (intval($prod['CANT'])>1) {
+                                $prod['CANT']=intval($prod['CANT'])-1;
                                 $op=$prod;
                                 $ke=$indice;
                                 $_SESSION['CARRITO'][$ke]=$op;
                             }else{
-                                echo "nelson";
+                                //echo "nelson";
                             }
                             //echo "<script>alert('elemento QUITADO');</script>";
                         }
                     }
                 }
-                break;
+            break;
+            
         }
     }
 ?>

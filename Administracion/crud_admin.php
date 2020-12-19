@@ -5,16 +5,35 @@
 
     if(isset($_SESSION['admin_on'])){
         //Aqui a gregar la parte a procesar
+
+        if(isset($_POST['btnAction'])){
+            switch($_POST['btnAction']){
+                case 'Add_us':
+                    header('location:regist.php');
+                    break;
+                case 'Add_prod':
+                    header('location:Add_producto.php');
+                    break;
+                case 'Add_ofer':
+                    header('location:Add_ofer.php');
+                    break;
+            }
+        }
         
-        if($_POST['btnAccionUs']){
+        if(isset($_POST['btnActionUs'])){
             $id_us=$_POST['id_us'];
-            switch($$_POST['btnAccionUs']){
+            switch($_POST['btnActionUs']){
                 case 'Eliminar':
                     if($id_us!=$_SESSION['admin_on']){
                         //proceder a eliminar
 
                         //Haber si podemos meter un yes/no
-                        delete_user($id_us);
+                        if(delete_user($id_us)){
+                            //
+                            echo "<script>alert('Usuario eliminado :c');</script>";
+                        }else{
+                            echo "<script>alert('error');</script>";
+                        }
                     } 
                     break; 
                 case 'Actualizar':
@@ -29,19 +48,22 @@
                     }
                     header("location:edit_registro.php?id_us=$id_us&tipo=u&imp=$imp");
                     break;
-                case 'Agregar':
-                    header('location:../regist.php');
-                    break;
-
+               
             }
 
         }
-        if($_POST['btnAccionProd']){
+        if(isset($_POST['btnActionProd'])){
             $id_prod=$_POST['id_prod'];
-            switch($$_POST['btnAccionProd']){
+            switch($_POST['btnActionProd']){
                 case 'Eliminar':
                     //Aqui tambien realizar la confirmacion.
-                    delete_product($id_prod);
+                    if(delete_product($id_prod)){
+                        echo "<script>alert('Producto Eliminado!! :c');</script>";
+
+                    }else{
+                        echo "<script>alert('error');</script>";
+                    }
+                    
                     break;
                 case 'Actualizar':
                     header("location:edit_registro.php?id_prod=$id_prod&tipo=p");
@@ -52,6 +74,8 @@
 
             }
         }
+    } else {
+        header("Location: ../index.php");
     }
 
 ?>

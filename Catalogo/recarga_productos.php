@@ -18,6 +18,7 @@
 </head>
 <body>
 <main>
+    <div class="products" style="margin-top: 0">
 <?php
 
 
@@ -32,7 +33,7 @@
         //para encontrar la categoria sobre la cual buscar
         $categoria=$filters->categoria;
         $rebajas=$filters->rebajas;
-
+        $nuevos=$filters->nuevos;
         if ($filters->band==true) {
             
             if ($rebajas==true) {
@@ -65,14 +66,31 @@
             }
 
             if($rebajas){
+                
                 if($b_first){
+                    $str_filtrado=$str_filtrado."(";
                     $str_filtrado=$str_filtrado." o.fec_inicio <= NOW() AND o.fec_fin >= NOW()";
                     $b_first=false;
                 }else{
-                    $str_filtrado=$str_filtrado." AND o.fec_inicio <= NOW() AND o.fec_fin >= NOW()";
+                    $str_filtrado=$str_filtrado." AND (";
+                    $str_filtrado=$str_filtrado." o.fec_inicio <= NOW() AND o.fec_fin >= NOW()";
                 }
 
-               
+                $str_filtrado=$str_filtrado.")";
+            }
+
+            if($nuevos){
+                if($b_first){
+                    $str_filtrado=$str_filtrado."(";
+                    $str_filtrado=$str_filtrado." MONTH(fecha_lanzamiento) = MONTH(CURDATE())";
+                    $b_first=false;
+                }else{
+                    $str_filtrado=$str_filtrado." AND (";
+                    $str_filtrado=$str_filtrado." MONTH(fecha_lanzamiento) = MONTH(CURDATE())";
+                }
+
+                $str_filtrado=$str_filtrado.")";
+
             }
             
             $seguns=true;
@@ -233,16 +251,22 @@
             $str_filtrado=$str_filtrado.";";
             
         }else{
-            if($categoria=="null"){
-                $str_filtrado="SELECT * FROM producto WHERE producto.status=1;";
+            if($categoria!="null"){
+                $str_filtrado="SELECT * FROM producto WHERE producto.status=1 AND producto.categoria LIKE '%$categoria%'";
+            }elseif($nuevos){
+                $str_filtrado="SELECT * FROM producto WHERE producto.status=1 AND  MONTH(fecha_lanzamiento) = MONTH(CURDATE())";
+            }elseif($rebajas){
+                $str_filtrado="SELECT * FROM producto NATURAL JOIN ofertas WHERE producto.status=1 ";
             }else{
-                $str_filtrado="SELECT * FROM producto WHERE producto.status=1 AND producto.categoria LIKE '%$categoria%';";
+                $str_filtrado="SELECT * FROM producto WHERE producto.status=1 ";
             }
+            $str_filtrado=$str_filtrado." AND (precio >=".doubleval($filters->minPrice)." AND precio <= ".doubleval($filters->maxPrice).")";
+
         }
 
 
         //EJECUCION DE LA CONSULTA
-        //echo $str_filtrado;
+        echo $str_filtrado;
         $products_to_show=$GLOBALS['conne']->query($str_filtrado);
         if ($products_to_show->num_rows > 0) {
             foreach($products_to_show as $prod){
@@ -252,7 +276,7 @@
                     //Aqui muestras los productos cuando se buscan por rebajas
 ?>
         <div class="item-box">
-            <form action="">
+            <form action="" method="POST">
                 <div class="img-item">
                     <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
                 </div>
@@ -262,7 +286,7 @@
                     <div class="info-item">
                         <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
                         <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
-                        <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
+                        <input type="hidden" name="ID" value="<?php echo $prod['ID_producto'] ?>">
                         <input type="hidden" name="CANT" value="1">
                         <input type="hidden" name="talla" value="M">
                     </div>
@@ -280,7 +304,7 @@
 ?>
 
 <div class="item-box">
-            <form action="">
+            <form action="" method="POST">
                 <div class="img-item">
                     <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
                 </div>
@@ -290,7 +314,7 @@
                     <div class="info-item">
                         <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
                         <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
-                        <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
+                        <input type="hidden" name="ID" value="<?php echo $prod['ID_producto'] ?>">
                         <input type="hidden" name="CANT" value="1">
                         <input type="hidden" name="talla" value="M">
                     </div>
@@ -312,6 +336,7 @@
     }
 
 ?>
+</div>
 </main>
 </body>
 </html>

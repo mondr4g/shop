@@ -1,6 +1,7 @@
 <?php
     session_start();
     include '../DB_FUNCTIONS/DB_Functions.php';
+    include '../Carrito/ticket.php';
     //validar si aun no se ha realizado el login
     if(isset($_GET['valid']))
         $v = $_GET['valid'];
@@ -56,6 +57,7 @@
     <?php
         }elseif($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on']) )){
             $usuario=validate_user($_POST['user'],$_POST['passw']);
+            $us=select_user($usuario['Id_usuario']);
             if($usuario){
                 //aqui se decide que tipo de usuario es 
                 if(select_admin($usuario['Id_usuario'])){
@@ -63,6 +65,9 @@
                     header("location:../Administracion/index_admin.php");
                 }else{
                     $_SESSION['client_on']=$usuario['Id_usuario'];
+                    if(intval(date("d")) >= 1 && intval(date("d")) < 20) {
+                        sendMailNew($us['email']);
+                    }
                     header("location:../index.php");
                 }
                 //puta madreeee

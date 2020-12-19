@@ -70,6 +70,17 @@
         }
     }
 
+    //funcion para recuperar admin de ventas
+    function select_sales_admin(){
+        $sql_sel="SELECT * FROM usuario INNER JOIN administrador ON usuario.Id_usuario=administrador.Id_admin WHERE administrador.rol='ventas'";
+        $r=$GLOBALS['conne']->query($sql_sel);
+        if($r->num_rows>0){
+            return $r->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
     //***********************
     //Funciones para insertar nuevos usuarios
     //***********************
@@ -78,16 +89,35 @@
         //$user_data['fecha']
         if (!search_user_by_usname($user_data['username'])) {
             $nueva_fecha="";
-            $sql_insert="INSERT INTO `usuario`( `username`, `passw`, `email`, `p_nombre`, `s_nombre`, `ape_pat`, `ape_mat`, ".
-            "`fec_nac`, `telefono`, `ciudad`, `colonia`, `estado`, `calle`, `numero`, `num_interior`, `cod_postal`) VALUES ".
+            $sql_insert="INSERT INTO `usuario`( `username`, `passw`, `email`, `p_nombre`, `s_nombre`, `ape_pat`, `ape_mat`,`fec_nac`, `telefono`) VALUES ".
             "('".$user_data['username']."','".sha1($user_data['password'])."','".$user_data['email']."',".
             "'".$user_data['nom_1']."','".$user_data['nom_2']."','".$user_data['ape_1']."','".$user_data['ape_2']."',".
-            "'".$user_data['fec_nac']."','".$user_data['tel']."','".$user_data['ciudad']."','".$user_data['colonia']."',".
-            "'".$user_data['estado']."','".$user_data['calle']."',".intval($user_data['num_ext']).",'".$user_data['num_int']."','".$user_data['codigo']."');";
+            "'".$user_data['fec_nac']."','".$user_data['tel']."');";
 
+            //, `ciudad`, `colonia`, `estado`, `calle`, `numero`, `num_interior`, `cod_postal`
+            //'".$user_data['ciudad']."','".$user_data['colonia']."',".
+            //"'".$user_data['estado']."','".$user_data['calle']."',".intval($user_data['num_ext']).",'".$user_data['num_int']."','".$user_data['codigo']."'
             if ($GLOBALS['conne']->query($sql_insert)) {
+                echo "<script>alert('AAAAA')</script>";
+                $sql_rec="SELECT * FROM usuario ORDER by Id_usuario DESC LIMIT 1";
+                $res=$GLOBALS['conne']->query($sql_rec);
+                if($res->num_rows>0){
+                    $p=$res->fetch_assoc();
+                    $sql_ins_dir="INSERT INTO `direcciones`(`Id_usuario`,`estado`, `ciudad`, `colonia`, `cod_postal`, `calle`, `numero`, `num_interior` ) VALUES ".
+                    "(".intval($p['Id_usuario']).",'".$user_data['estado']."','".$user_data['ciudad']."','".$user_data['colonia']."','".$user_data['calle']."','".$user_data['codigo']."',".intval($user_data['num_ext']).",'".$user_data['num_int']."');";
+                   
+                    if($GLOBALS['conne']->query($sql_ins_dir)){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                    return true;
+                }else{
+                    return false;
+                }
                 return true;
             } else {
+                echo "la";
                 return false;
             }
         }else{
@@ -96,7 +126,7 @@
     }
     //inertar administrador
     function insert_admin($id_user){
-        $sql_insert="INSERT INTO `administrador`(`Id_cliente`) VALUES ".
+        $sql_insert="INSERT INTO `administrador`(`Id_admin`,`rol`) VALUES ".
         "(".intval($id_user).");";
         $GLOBALS['conne']->query($sql_insert);
     }
@@ -110,7 +140,7 @@
 
     //RECUPERAR TODOS LOS CLIENTES
     function select_all_clients(){
-        $sql_select_client="SELECT * FROM usuario NATURAL JOIN cliente;";
+        $sql_select_client="SELECT * FROM usuario INNER JOIN cliente ON usuario.Id_usuario=cliente.Id_cliente;";
         $result=$GLOBALS['conne']->query($sql_select_client);
         if($result->num_rows>0){
             return $result;
@@ -154,9 +184,9 @@
 
     //recuperar todos los administradores
     function select_all_admins(){
-        $sql_select_client="SELECT * FROM usuario NATURAL JOIN administrador;";
+        $sql_select_client="SELECT * FROM usuario INNER JOIN administrador ON usuario.Id_usuario=administrador.Id_admin;";
         $result=$GLOBALS['conne']->query($sql_select_client);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result;
         }else{
             return null;
@@ -167,7 +197,7 @@
     function get_admin($id_admin){
         $sql_sel="SELECT * FROM usuario NATURAL JOIN administrador WHERE usuario.Id_usuario=".intval($id_admin).";";
         $result=$GLOBALS['conne']->query($sql_sel);
-        if($result->num_rows()>0){
+        if($result->num_rows>0){
             return $result->fetch_assoc();
         }else{
             return null;
@@ -187,7 +217,7 @@
 
     //funcion para eliminar cualquier usuario, se supone que la base de datos realiza una eliminacion e actualizacion en cascada
     function delete_user($id_usuario){
-        $sql_del="DELETE FROM usuario WHERE usuario.Id_usuario=".$id_usuario.";";
+        $sql_del="DELETE FROM usuario WHERE usuario.Id_usuario=".intval($id_usuario).";";
         if($GLOBALS['conne']->query($sql_del)){
             return true;
         }else{
@@ -226,7 +256,7 @@
         //se supone que la estructura de las imagenes ya viene definida como string JSON.
         //se supone que las tallas vienen definidas en un string JSON
         //,".doubleval($p_data['precio']).",".intval($p_data['stock']).",
-        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`,`precio`, `marca`, `tipo`, `tallas`".
+        $sql_insert="INSERT INTO `producto`(`nombre`, `detalles`,`precio`, `marca`, `tipo`, `tallas`,".
         "`Fecha_lanzamiento`, `categoria`, `imgs`, `status`) VALUES ".
         "('".$p_data['nombre']."','".$p_data['detalles']."',".doubleval($p_data['precio']).",'".$p_data['marca']."',".
         "'".$p_data['tipo']."','".$p_data['tallas']."','".$p_data['fecha']."','".$p_data['categoria']."','".$p_data['imgs']."',".intval($p_data['status']).");";
@@ -330,7 +360,7 @@
     //funcion para retornar el stock dependiendo de la talla que reciba
     function product_stock($id_prod, $talla){
 
-        $sql_prod_stock="SELECT JSON_EXTRACT(tallas,'$.$talla') WHERE producto.ID_producto = ".intval($id_prod)." ;";
+        $sql_prod_stock="SELECT JSON_EXTRACT(tallas,'$.$talla') as STOCK FROM producto WHERE producto.ID_producto = ".intval($id_prod)." ;";
         $result=$GLOBALS['conne']->query($sql_prod_stock);
         if($result){
             return $result->fetch_assoc();
@@ -360,18 +390,40 @@
     //********************** 
     //Para las compras
     //***********************
-    function new_sale($data_compra){
-        $sql_insert="INSERT INTO `compra`(`Id_cliente`, `total`) VALUES (".intval($data_compra['cliente']).",".doubleval($data_compra['total']).");";
+    function new_sale($cliente, $total){
+        $sql_insert="INSERT INTO `compra`(`Id_cliente`, `total`) VALUES (".intval($cliente).",".doubleval($total).");";
         if ($GLOBALS['conne']->query($sql_insert)) {
+            $sql_rec="SELECT * FROM compra ORDER by compra.Id_compra ASC LIMIT 1";
+            $res=$GLOBALS['conne']->query($sql_rec);
+            if($res->num_rows>0){
+                $p=$res->fetch_assoc();
+                return $p['Id_compra'];
+            }else{
+                return true;
+            }
+            
+        }else{
+            return false;
+        }
+    }
+
+    //actualizar stock
+    function actualiza_stock($id_prod, $talla, $cantidad){
+        $stock=product_stock($id_prod, $talla);
+        $st=intval($stock['STOCK'])-intval($cantidad);
+        $sql_updt="UPDATE producto SET tallas=JSON_REPLACE(tallas,'$.$talla',$st) WHERE ID_producto=".intval($id_prod).";";
+        $res=$GLOBALS['conne']->query($sql_updt);
+        if($res){
             return true;
         }else{
+            echo "error";
             return false;
         }
     }
 
     //eliminar un producto.
     function delete_product($id_prod){
-        $sql_del="DELETE FROM producto WHERE producto.ID_producto=".$id_prod.";";
+        $sql_del="DELETE FROM producto WHERE producto.ID_producto=".intval($id_prod).";";
         if($GLOBALS['conne']->query($sql_del)){
             return true;
         }else{
@@ -380,9 +432,9 @@
     }
 
     //insertar detalle de compra
-    function new_sale_detail($id_compra, $prods){
+    function new_sale_detail($id_compra, $id_prod, $cant, $talla){
         //$prods es un array que contiene el id del producto, la talla y la cantidad.
-        $sql_insert="INSERT INTO `detalle_compra`(".inval($id_compra).",".intval($prods['Id_producto']).",".intval($prods['cant']).",`".$prods['talla']."`); ";
+        $sql_insert="INSERT INTO `detalle_compra` (`Id_compra`, `Id_producto`, `cantidad`, `talla`) VALUES (".intval($id_compra).",".intval($id_prod).",".intval($cant).",'".$talla."'); ";
         if($GLOBALS['conne']->query($sql_insert)){
             return true;
         }else{
@@ -392,7 +444,7 @@
 
     //retornar los productos comprados detalle de compra
     function sale_details($id_compra){
-        $sql_sel="SELECT * FROM detalle_compra WHERE Id_compra = ".intval($id_compra).";";
+        $sql_sel="SELECT * FROM detalle_compra INNER JOIN producto ON detalle_compra.Id_producto=producto.ID_producto WHERE Id_compra = ".intval($id_compra)." GROUP BY detalle_compra.Id_producto;";
         $result=$GLOBALS['conne']->query($sql_sel);
         if($result->num_rows>0){
             return $result;
@@ -402,14 +454,36 @@
 
     }
 
+    function get_sale($id_compra){
+        $sql_sel="SELECT * FROM compra WHERE Id_compra=".intval($id_compra).";";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
+    function obtain_pass($id_user){
+        $sql_obta="SELECT passw FROM usuario WHERE Id_usuario=".intval($id_user).";";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result->fetch_assoc();
+        }else{
+            return null;
+        }
+    }
+
     //UPDATE `usuario` as u NATURAL JOIN cliente as c SET `num_interior`='A6', c.genero='Hombre' WHERE Id_usuario=1
     //faltan
     function modify_cliente($a_data){
-        $sql_update="UPDATE usuario AS u INNER JOIN cliente AS c ON u.Id_usuario=c.Id_usuario SET u.username=".
-        "'".$a_data['username']."', u.email='".$a_data['email']."',".
+        //UPDATE usuario AS u INNER JOIN cliente AS c ON u.Id_usuario=c.Id_cliente INNER JOIN direcciones AS d ON u.Id_usuario=d.Id_usuario SET d.estado='Aguas', c.gustos='caca', u.telefono='000000000'
+        
+        $sql_update="UPDATE usuario AS u INNER JOIN cliente AS c ON u.Id_usuario=c.Id_cliente INNER JOIN direcciones AS d ON u.Id_usuario=d.Id_usuario SET u.username=".
+        "'".$a_data['username']."', u.passw='".$a_data['password']."' u.email='".$a_data['email']."',".
         "u.p_nombre='".$a_data['nom_1']."',u.s_nombre='".$a_data['nom_2']."',u.ape_pat='".$a_data['ape_1']."',u.ape_mat='".$a_data['ape_2']."',".
-        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',u.ciudad='".$a_data['ciudad']."',u.colonia='".$a_data['colonia']."',".
-        "u.estado='".$a_data['estado']."',u.calle='".$a_data['calle']."',u.numero=".intval($a_data['num_ext']).",u.num_interior='".$a_data['num_int']."',u.cod_postal='".$a_data['codigo']."', ".
+        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',d.ciudad='".$a_data['ciudad']."',d.colonia='".$a_data['colonia']."',".
+        "d.estado='".$a_data['estado']."',d.calle='".$a_data['calle']."',d.numero='".$a_data['num_ext']."',d.num_interior='".$a_data['num_int']."',d.cod_postal='".$a_data['codigo']."', ".
         "c.gustos='".$a_data['gustos']."', c.genero='".$a_data['genero']."' WHERE u.Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
             return true;
@@ -420,11 +494,11 @@
     }
 
     function modify_admin($a_data){
-        $sql_update="UPDATE usuario u INNER JOIN administrador a ON u.Id_usuario=a.Id_usuario SET username=".
+        $sql_update="UPDATE usuario AS u INNER JOIN administrador AS a ON u.Id_usuario=a.Id_admin INNER JOIN direcciones AS d ON u.Id_usuario=d.Id_usuario SET u.username=".
         "'".$a_data['username']."', u.email='".$a_data['email']."',".
         "u.p_nombre='".$a_data['nom_1']."',u.s_nombre='".$a_data['nom_2']."',u.ape_pat='".$a_data['ape_1']."',u.ape_mat='".$a_data['ape_2']."',".
-        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',u.ciudad='".$a_data['ciudad']."',u.colonia='".$a_data['colonia']."',".
-        "u.estado='".$a_data['estado']."',u.calle='".$a_data['calle']."',u.numero=".intval($a_data['num_ext']).",u.num_interior='".$a_data['num_int']."',u.cod_postal='".$a_data['codigo']."' ".
+        "u.fec_nac='".$a_data['fec_nac']."',u.telefono='".$a_data['tel']."',d.ciudad='".$a_data['ciudad']."',d.colonia='".$a_data['colonia']."',".
+        "d.estado='".$a_data['estado']."',d.calle='".$a_data['calle']."',d.numero='".$a_data['num_ext'].",d.num_interior='".$a_data['num_int']."',d.cod_postal='".$a_data['codigo']."' ".
         " WHERE u.Id_usuario=".intval($a_data['id'])." ;";
         if($GLOBALS['conne']->query($sql_update)){
             return true;
@@ -497,8 +571,60 @@
     //***********************
     //Funciones para los ofertas
     //***********************
-
+    //SELECT * FROM (producto NATURAL JOIN ofertas) WHERE (DAY(CURDATE()) BETWEEN 0 AND 7) AND producto.categoria LIKE 'hombre'
+    function sales_by_date($cate){
+        $sql_sel="SELECT * FROM (producto NATURAL JOIN ofertas) WHERE (fec_inicio <= NOW() AND fec_fin >= NOW()) AND producto.categoria LIKE '%$cate%' ;";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return false;
+        }
+    }
      //***********************
     //Funciones para los productos
     //***********************
+
+    function select_all_products_without(){
+        $sql_sel="SELECT * FROM producto LEFT JOIN ofertas ON producto.ID_producto=ofertas.Id_producto WHERE ofertas.Id_producto IS NULL;";
+        $result=$GLOBALS['conne']->query($sql_sel);
+        if($result->num_rows>0){
+            return $result;
+        }else{
+            return false;
+        }
+    }
+    //Agregar ofertas
+    function new_offer($a_data){
+        $sql_insert="INSERT INTO `ofertas`(`Id_producto`,`porcentaje`,`fec_inicio`, `fec_fin`) VALUES ".
+        "(".intval($a_data['id_prod']).", ".doubleval($a_data['porcentaje']).", '".$a_data['fecha_ini']."','".$a_data['fecha_fin']."');";
+        if($GLOBALS['conne']->query($sql_insert)){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+    //retorna todos los posibles chats que hay
+    function chats_disponibles(){
+        $sql_disp="SELECT usuario.* FROM usuario NATURAL JOIN chat_mensaje GROUP BY chat_mensaje.Id_usuario;";
+        $res=$GLOBALS['conne']->query($sql_disp);
+        if($res->num_rows>0){
+            return $res;
+        }else{
+            return null;
+        }
+    }
+
+    //elimina el chat por completo
+    function del_chat($id_us){
+        $sql_del="DELETE FROM chat_mensaje WHERE Id_usuario=".intval($id_us).";";
+        if($GLOBALS['conne']->query($sql_del)){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
 ?>

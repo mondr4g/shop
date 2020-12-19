@@ -29,6 +29,27 @@
                 <li><a href="catalogo.php?categoria=ninos">Niño/a</a></li>
                 <li><a href="catalogo.php?rebajas=true">Rebajas</a></li>
                 <?php
+                    if (isset($_SESSION['admin_on'])) {      
+                ?>
+                    <li><a href="../Administracion/index_admin.php">Admin</a></li>
+                <?php
+                    }
+                ?>
+                <?php
+                    if (isset($_SESSION['client_on'])) {      
+                ?>
+                    <li><a href="../Chat/chat.php">Chat</a></li>
+                <?php
+                    }
+                ?>
+                <?php
+                    if (isset($_SESSION['admin_on'])) {      
+                ?>
+                    <li><a href="../Administracion/chat_admin.php">Chat</a></li>
+                <?php
+                    }
+                ?>
+                <?php
                     if (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on'])) {        
                 ?>
                 <li><a href="../Sesiones/login.php">Sign in</a></li>
@@ -43,7 +64,7 @@
                     }
                 ?>
             </ul>
-            <a href="#contact"><img id="shop-car" src="../img/shopping_car.png" alt="shop-car"></a>
+            <a href="../Carrito/mostrar_carrito.php"><img id="shop-car" src="../img/shopping_car.png" alt="shop-car"></a>
         </nav>
 	</header>	
 	<main>
@@ -63,6 +84,14 @@
                                 echo "<input type='text' id='reb' value='" . $_GET['rebajas'] . "'>";
                             else
                                 echo "<input type='text' id='reb'>"; 
+                        ?>
+                    </div>
+                    <div id="newLanz">
+                        <?php 
+                            if(isset($_GET['nuevos']))
+                                echo "<input type='text' id='nLanz' value='" . $_GET['nuevos'] . "'>";
+                            else
+                                echo "<input type='text' id='nLanz'>"; 
                         ?>
                     </div>
                     <div class="input-group">
@@ -85,16 +114,17 @@
                     <br>
                     <div class="input-group">
                         <h3>Precio Minimo</h3>
-                        $500 <input type="range" id="iprice" name="initial_price" min="500" max="3000" list="tickmarks" value="500" step="500" onchange="imaxPrice()"> <label id="imaxPrice">$3000</label><br><br>
+                        $100 <input type="range" id="iprice" name="initial_price" min="100" max="3100" list="tickmarks" value="100" step="500" onchange="imaxPrice()"> <label id="imaxPrice">$100</label><br><br>
                         <h3>Precio Maximo</h3>
-                        $500 <input type="range" id="fprice" name="final_price" min="500" max="3000" list="tickmarks" value="3000" step="500" onchange="fmaxPrice()"> <label id="fmaxPrice">$3000</label><br>
+                        $100 <input type="range" id="fprice" name="final_price" min="100" max="3100" list="tickmarks" value="3100" step="500" onchange="fmaxPrice()"> <label id="fmaxPrice">$3100</label><br>
                         <datalist id="tickmarks">
-                            <option value="500">
-                            <option value="1000">
-                            <option value="1500">
-                            <option value="2000">
-                            <option value="2500">
-                            <option value="3000">
+                            <option value="100">
+                            <option value="600">
+                            <option value="1100">
+                            <option value="1600">
+                            <option value="2100">
+                            <option value="2600">
+                            <option value="3100">
                         </datalist>
                     </div>
             </div>
@@ -115,7 +145,7 @@
                             # code...
                             $imgs=json_decode($prod['imgs']); ?> 
                             <div class="item-box">
-                                <form action="">
+                                <form action="" method="POST">
                                     <div class="img-item">
                                         <a href="vista_producto.php?id_del_prod=<?php echo $prod['ID_producto'] ?>"><img class="imgi" src="<?php echo $imgs->I1 ?>" alt="item1"></a> 
                                     </div>
@@ -125,7 +155,7 @@
                                         <div class="info-item">
                                             <input type="hidden" name="nombre" value="<?php echo $prod['nombre']?>">
                                             <input type="hidden" name="precio" value="<?php echo $prod['precio']?>">
-                                            <input type="hidden" name="ID" value="<?php echo $prod['Id_producto'] ?>">
+                                            <input type="hidden" name="ID" value="<?php echo $prod['ID_producto'] ?>">
                                             <input type="hidden" name="CANT" value="1">
                                             <input type="hidden" name="talla" value="M">
                                         </div>

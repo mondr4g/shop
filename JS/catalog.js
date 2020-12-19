@@ -21,6 +21,7 @@ function getFilter() {
     let fprice = document.getElementById('fprice').value;
     let category = document.getElementById('cat').value;
     let rebajas = document.getElementById('reb').value;
+    let lanz = document.getElementById('nLanz').value;
     let filter = '{';
     let all = false;
 
@@ -89,6 +90,11 @@ function getFilter() {
         filter += ' "rebajas" : ' + rebajas + ', ';
     else
         filter += ' "rebajas" : false, ';
+
+    if(lanz == "true") 
+        filter += ' "nuevos" : ' + lanz + ', ';
+    else
+        filter += ' "nuevos" : false, ';
 
     filter += ' "band" : ' + all + ' }';
     let obj = filter;

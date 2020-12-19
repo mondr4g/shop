@@ -157,6 +157,26 @@
                                             <option value="2" >Administrador</option>
                                         </select>
                                     </div>
+                                    <div class="input-group">
+                                        <label> ROL </label>
+                                        <input type="text" name="rol" autocomplete="off" required>
+                                    </div> 
+                                </div>
+                                <input type="hidden" name="tipo" value="1">
+                                <div class="input2">
+                                    <div style="width: 100%; justify-content: left;">
+                                        <label>Genero</label>
+                                        <div style="display: flex; width: 30%">
+                                            <input type="radio" name="genero" value="hombre"> Hombre
+                                        </div>
+                                        <div style="display: flex; width: 25%">
+                                            <input type="radio" name="genero" value="mujer"> Mujer
+                                        </div>
+                                    </div>
+                                    <div class="input-group" >
+                                        <label >Gustos</label>
+                                        <input type="text" name="gustos" id="gustos">
+                                    </div>
                                 </div>
                         <?php
                             }else{
@@ -192,7 +212,7 @@
     </footer>
     <?php
             //abierto a modificacion si solo queremos que el admin registre usuarios
-        }elseif ($_POST && (!isset($_SESSION['admin_on']) && !isset($_SESSION['client_on']) )) {
+        }elseif ($_POST  && ( isset($_SESSION['admin_on']) || isset($_SESSION['client_on']))) {
             $new_user_data = array(
                 "username" => $_POST['txtusr'],
                 "password" => $_POST['txtpasswd'],
@@ -220,7 +240,7 @@
                 if($_POST['tipo']=="1"){
                     insert_client($id,$_POST['genero'],$_POST['gustos']);
                 }elseif($_POST['tipo']=="2"){
-                    insert_admin($id);
+                    insert_admin($id,$_POST['rol']);
                 }
                 if($_SESSION['admin_on'])
                     header('location:index_admin.php');
